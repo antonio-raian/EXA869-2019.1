@@ -7,3 +7,9 @@ Lexema  --->  possível erro1
 1.   -->   precisa de um numero depois do "."
 .0    -->   precisa de um numero antes do "."
 -.0   -->   precisa de um numero antes do "."
+
+
+###Erro de cadeia de caracteres##############
+"..EOF  --> chegou ao fim do arquivo sem fechar a cadeia
+"<simbolo>" --> Simbolo fora do ASCII
+" \"    --> O "\" faz as aspas não ser final e asim mesmo erro de cima
