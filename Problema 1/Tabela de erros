@@ -1,0 +1,9 @@
+Tabela
+
+Lexema  --->  possível erro1
+        --->  possivel erro2
+
+###Erro de Numeros###########
+1.   -->   precisa de um numero depois do "."
+.0    -->   precisa de um numero antes do "."
+-.0   -->   precisa de um numero antes do "."
