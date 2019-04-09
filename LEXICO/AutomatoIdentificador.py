@@ -21,9 +21,10 @@ def automato_identificador(palavra):
     cont=0
     if palavra=="principal":
         cont=1
-        break
     elif palavra=="inteiro":
         cont=1
-        break
 
-    return if (cont == 1) ? ("PRE " + palavra) , ("IDE " + palavra)
+    if (cont == 1):
+        return("PRE " + palavra)
+    else:
+        return("IDE " + palavra)
