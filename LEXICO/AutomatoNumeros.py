@@ -5,7 +5,7 @@ Created on Tue Apr  2 2019
 @author: Antonio Raian e Diogo Lima
 """
 
-def automatoNumeros(palavra):
+def automato_numeros(palavra):
 
     tamanho = len(palavra)
     i = 0

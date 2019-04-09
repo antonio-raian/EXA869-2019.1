@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Created on Tue Apr  2 12:12:18 2019
+Created on Tue Apr  9 2019
 
 @author: Antonio Raian e Diogo Lima
 """
@@ -9,7 +9,7 @@ BLOCO = 2
 ERRO = 0
 
 #Modulo pra dizer se é comentário de bloco ou linha
-def automatoNumeros(palavra):
+def automato_comentario(palavra):
 
     tam = len(palavra)
     cont = 0
