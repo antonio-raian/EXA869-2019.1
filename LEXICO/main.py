@@ -7,7 +7,7 @@ import AutomatoComentario as coment
 diretorio = os.getcwd()+"/teste/"
 names_arq = os.listdir(diretorio)
 
-DELIMITADORES = [' ', '/', ':', ',']
+DELIMITADORES = [' ', '/', ':', ',', '(',')', '[', ']', '{', '}']
 
 for file in names_arq:
 	print(diretorio+file)
