@@ -15,9 +15,9 @@ def automato_comentario(palavra):
     cont = 0
     i = 0
 
-    if(palavra[i]=='/'):
-        if(palavra[i+1]=='/'):
-            return LINHA
-        else if (palavra[i+1]=='*'):
-            return BLOCO
-    return ERRO
+    for carac in palavra:
+        if(carac == '*'):
+            i+=1
+            cont = 1
+        if(cont == 1 and carac =="/"):
+            return palavra[i:]
