@@ -7,24 +7,27 @@ import AutomatoComentario as coment
 diretorio = os.getcwd()+"/teste/"
 names_arq = os.listdir(diretorio)
 
-DELIMITADORES = [' ', '/', ':', ',', '(',')', '[', ']', '{', '}']
+DELIMITADORES = [' ', '/', ':', ',', '(',')', '[', ']', '{', '}', '\n']
 
 for file in names_arq:
+	numLinha = 0
 	print(diretorio+file)
 	with open(diretorio+file) as arq:
 		linhas = arq.readlines()
-		palavras = []
+
 		for linha in linhas:
-			#print(linha)
+			palavras = []
+			numLinha+=1
 			palavra = ''
 			for carac in linha:
-				print(carac)
 				if(carac not in DELIMITADORES):
 					palavra+=carac
 				else:
-					palavras.append(palavra)
-					palavra = ''
+					if(palavra!=''):
+						palavras.append(palavra)
+						palavra = ''
 					if carac != ' ' and carac !='\n':
 						palavras.append(carac)
-
+			if(palavra!=''):
+				palavras.append(palavra)
 			print(palavras)
