@@ -1,4 +1,4 @@
-#Código principal do compilador
+#CÃ³digo principal do compilador
 # -*- coding: utf-8 -*-
 import os
 import AutomatoIdentificador as aut_identi
@@ -13,6 +13,9 @@ DELIMITADORES = [' ', '/', ':', ',', '(',')', '[', ']', '{', '}', '\n']
 for file in names_arq:
 	numLinha = 0
 	print(diretorio+file)
+	nomeArqAtual = os.path.basename(file)
+	output = open(nomeArqAtual, 'w')
+
 	with open(diretorio+file) as arq:
 		linhas = arq.readlines()
 
@@ -45,4 +48,7 @@ for file in names_arq:
 				#else:
 					#result = "Err "+palavra
 				print(str(numLinha)+" "+result)
+				output.write(str(numLinha)+" "+result)
+				output.write('\n')
 			print(palavras)
+		output.close()
