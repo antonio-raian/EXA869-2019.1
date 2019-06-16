@@ -26,6 +26,38 @@ def automato_identificador(palavra):
         cont=1
     elif palavra=="inteiro":
         cont=1
+    elif palavra=="constantes":
+        cont=1
+    elif palavra=="variaveis":
+        cont=1
+    elif palavra=="metodo":
+        cont=1
+    elif palavra=="resultado":
+        cont=1
+    elif palavra=="programa":
+        cont=1
+    elif palavra=="entao":
+        cont=1
+    elif palavra=="senao":
+        cont=1
+    elif palavra=="enquanto":
+        cont=1
+    elif palavra=="leia":
+        cont=1
+    elif palavra=="escreva":
+        cont=1
+    elif palavra=="vazio":
+        cont=1
+    elif palavra=="real":
+        cont=1
+    elif palavra=="boleano":
+        cont=1
+    elif palavra=="texto":
+        cont=1
+    elif palavra=="verdadeiro":
+        cont=1
+    elif palavra=="falso":
+        cont=1
 
     if (cont == 1):
         return("PRE " + palavra)

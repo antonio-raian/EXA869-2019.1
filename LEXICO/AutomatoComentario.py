@@ -7,17 +7,30 @@ Created on Tue Apr  9 2019
 LINHA = 1
 BLOCO = 2
 ERRO = 0
+PASS = 3
 
 #Modulo pra dizer se é comentário de bloco ou linha
-def automato_comentario(palavra):
+def automato_comentario(bloco, linha):
 
-    tam = len(palavra)
-    cont = 0
-    i = 0
+	coment = 0
 
-    for carac in palavra:
-        if(carac == '*'):
-            i+=1
-            cont = 1
-        if(cont == 1 and carac =="/"):
-            return palavra[i:]
+	for carac in linha:
+		if(not bloco):#Não identificou comentário de bloco
+			if (coment == 0):
+				if (carac == '/'): 
+					coment +=1
+			elif (coment == 1):
+				if(carac == '/'):
+					return LINHA
+				elif (carac == '*'):
+					return BLOCO
+			else:
+				return ERRO
+		else: #Identificou comentario de bloco
+			if(coment == 0):
+				if(carac == '*'):
+					coment = 1
+			elif(coment == 1):
+				if(carac == '/'):
+					return BLOCO
+	return PASS
