@@ -9,6 +9,10 @@ import AutomatoCadeia as aut_cadeia
 #MAIN METOD
 diretorio = os.getcwd()+"/teste/"
 diretorioSaida = os.getcwd()+"/resultados/"
+if(os.path.isdir(diretorioSaida)):
+	print("Já tem a pasta de resultados")
+else:
+	os.mkdir(diretorioSaida)
 names_arq = os.listdir(diretorio)
 
 DELIMITADORES = ['',' ', ':', ',', ';', '(',')', '[', ']', '{', '}', '\n']
@@ -22,7 +26,7 @@ for file in names_arq:
 	coment = 0
 	print(diretorio+file)
 	nomeArqAtual = os.path.basename(file)
-	output = open(diretorioSaida + file, 'w')
+	output = open(diretorioSaida + 'Saída_'+file, 'w')
 
 	with open(diretorio+file) as arq:
 		linhas = arq.readlines()
