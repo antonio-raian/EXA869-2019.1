@@ -60,6 +60,7 @@ for file in names_arq:
 		print("PROSS")
 		print(linhas1)
 		numLinha = 0
+		cadeia = False
 
 		#Verifica as palavras q restaram
 		for linha in linhas1:
@@ -67,61 +68,74 @@ for file in names_arq:
 			numLinha+=1
 			palavra = ''
 			for carac in linha:
-				if(carac in DELIMITADORES):
-					if(palavra != ''): #Se não estiver vazia salva o que tem
+				if(cadeia):
+					palavra+=carac
+					if(carac == '"' or carac == '\n'):
+						cadeia = not cadeia
 						palavras.append(palavra)
 						palavra = ''
-					if(carac == ' ' and '-' in palavra and palavra[len(palavra)-1]==' '):
-						palavra += carac
-					if(carac != ' ' and carac != '\n' ):
-						palavras.append(carac)
-				elif(carac in RELACIONAIS):
-					if(len(palavra)>1):
-						palavras.append(palavra)
-						palavra = ''
-						palavra += carac
-					else:
-						if(len(palavra)==1):
-							if(palavra in RELACIONAIS and carac == '='):
-								palavra += carac
-								palavras.append(palavra)
-								palavra = ''
-							else:
-								palavras.append(palavra)
-								palavra = ''
-								palavra += carac
-						else:
+				else:
+					if(carac in DELIMITADORES):
+						if(palavra != ''): #Se não estiver vazia salva o que tem
+							palavras.append(palavra)
+							palavra = ''
+						if(carac == ' ' and '-' in palavra and palavra[len(palavra)-1]==' '):
 							palavra += carac
-				elif(carac in ARITMETICOS):
-					if(len(palavra)>1):
-						palavras.append(palavra)
-						palavra = ''
-						palavra += carac
-					else:
-						if(len(palavra)==1):
-							if(palavra == '+' and carac =='+'):
-								palavra += carac
-								palavras.append(palavra)
-								palavra = ''
-							elif(palavra == '-'):
-								if(carac == '-'):
+						if(carac != ' ' and carac != '\n' ):
+							palavras.append(carac)
+					elif(carac in RELACIONAIS):
+						if(len(palavra)>1):
+							palavras.append(palavra)
+							palavra = ''
+							palavra += carac
+						else:
+							if(len(palavra)==1):
+								if(palavra in RELACIONAIS and carac == '='):
 									palavra += carac
 									palavras.append(palavra)
 									palavra = ''
-								elif(carac == ' ' or carac in NUMEROS):
-									palavra+=carac
 								else:
 									palavras.append(palavra)
 									palavra = ''
 									palavra += carac
 							else:
-								palavras.append(palavra)
-								palavra = ''
 								palavra += carac
-						else:
+					elif(carac in ARITMETICOS):
+						if(len(palavra)>1):
+							palavras.append(palavra)
+							palavra = ''
 							palavra += carac
-				else:
-					palavra += carac
+						else:
+							if(len(palavra)==1):
+								if(palavra == '+' and carac =='+'):
+									palavra += carac
+									palavras.append(palavra)
+									palavra = ''
+								elif(palavra == '-'):
+									if(carac == '-'):
+										palavra += carac
+										palavras.append(palavra)
+										palavra = ''
+									elif(carac == ' ' or carac in NUMEROS):
+										palavra+=carac
+									else:
+										palavras.append(palavra)
+										palavra = ''
+										palavra += carac
+								else:
+									palavras.append(palavra)
+									palavra = ''
+									palavra += carac
+							else:
+								palavra += carac
+					elif(carac == '"'):
+						if(palavra!=''):
+							palavras.append(palavra)
+							palavra = ''
+						cadeia = not cadeia
+						palavra += carac
+					else:
+						palavra += carac
 				# if(palavra!=''):
 				# 	palavras.append(palavra)
 
@@ -140,9 +154,7 @@ for file in names_arq:
 					result = result_DEL
 				elif (result_CAD !='0'):
 					result = result_CAD
-				# print(str(numLinha)+" "+result)
 				if(result!=''):
 					output.write(str(numLinha)+" "+result)
 				output.write('\n')
-			print(palavras)
 		output.close()

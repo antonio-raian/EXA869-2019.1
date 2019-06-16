@@ -58,6 +58,8 @@ def automato_identificador(palavra):
         cont=1
     elif palavra=="falso":
         cont=1
+    elif palavra=="sistema":
+        cont=1
 
     if (cont == 1):
         return("PRE " + palavra)

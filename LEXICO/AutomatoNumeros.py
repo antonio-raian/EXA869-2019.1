@@ -10,7 +10,8 @@ def automato_numeros(palavra):
     tamanho = len(palavra)
     i = 0
     fim = 0
-
+    print ('NUMERO')
+    print (palavra)
     if palavra[i] == '-': #Verifica se tem um menos no começo da funcao
         i = i+1
         while fim < 1: #Ignora os espaços entre o - e o numero

@@ -7,7 +7,7 @@ import string
 
 LETRAS = list(string.ascii_letters)
 NUMEROS = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
-SIMBOLOS = [' ', '!', '#', '$', '%', '&', '(', ')', '*', '+', '-', ',', '.', '/', ':', ';', '<', '>', '=', '?', '@', '[', ']', '^', '_', '`', '{', '}', '|', '~', '\'', '\\']
+SIMBOLOS = [' ', '!', '#', '$', '%', '&', '(', ')', '*', '+', '-', ',', '.', '/', ':', ';', '<', '>', '=', '?', '@', '[', ']', '^', '_', '`', '{', '}', '|', '~', '\'', '\\', '"']
 
 #Deve-se passar como argumento tudo a partir da primeira aspas, e o proprio automato faz a separacao.
 #O return desse automato é sempre um vetor de 2 posicoes. Leia os comentários para entender melhor
@@ -25,3 +25,5 @@ def automato_cadeia(palavra):
     for carac in palavra:
         if(carac not in LETRAS and carac not in NUMEROS and carac not in SIMBOLOS):
             return 'Err_CAD '+palavra
+    
+    return 'CAD '+ palavra
