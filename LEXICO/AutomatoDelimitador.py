@@ -14,10 +14,14 @@ SIMBOLOS = ['@','#', '$', '%', '&', '?']
 
 def automato_delimitador(palavra):
     if(palavra in DELIMITADORES):
-        return ("DEL " + palavra)
+        return ('2',"DEL " + palavra)
     elif (palavra in RELACIONAIS):
-        return ("REL " + palavra)
+        return ('2',"REL " + palavra)
     elif (palavra in ARITMETICOS):
-        return ("ARI " + palavra)
+        return ('2',"ARI " + palavra)
+    elif (palavra in LOGICOS):
+        return ('2',"LOG " + palavra)
+    elif (palavra in SIMBOLOS):
+        return ('2',"SIM " + palavra)
     else:
-        return '0'
+        return ('0', '')

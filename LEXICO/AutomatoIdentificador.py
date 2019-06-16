@@ -15,11 +15,11 @@ def automato_identificador(palavra):
             if(carac in LETRAS):
                 i+=1
             else:
-                return '0'    
+                return ('0','')    
         elif carac in LETRAS or carac in NUMEROS:
             i+=1
         else:
-            return "ERR_IDE " + palavra
+            return ('1',"ERR_IDE " + palavra)
 
     cont=0
     if palavra=="principal":
@@ -62,6 +62,6 @@ def automato_identificador(palavra):
         cont=1
 
     if (cont == 1):
-        return("PRE " + palavra)
+        return('2',"PRE " + palavra)
     else:
-        return("IDE " + palavra)
+        return('2',"IDE " + palavra)

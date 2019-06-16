@@ -17,13 +17,13 @@ def automato_cadeia(palavra):
     aspas = False
 
     if(palavra[0]!='"'):
-        return '0'
+        return ('0', '')
     else:
         if(palavra[len(palavra)-1] != '"'):
-            return 'CMF '+palavra
+            return ('1','CaMF '+palavra)
 
     for carac in palavra:
         if(carac not in LETRAS and carac not in NUMEROS and carac not in SIMBOLOS):
-            return 'Err_CAD '+palavra
+            return ('2','Err_CAD '+palavra)
     
-    return 'CAD '+ palavra
+    return ('2','CAD '+ palavra)

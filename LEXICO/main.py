@@ -33,6 +33,7 @@ for file in names_arq:
 		linhas1 = []
 		bloco = False
 		linhaBloco = 0
+		erros = []
 
 		# Primeiro verifica se tem comentários e os remove
 		for linha in linhas:
@@ -54,15 +55,12 @@ for file in names_arq:
 				elif(comentRes == 3): #Não possui comentário na linha
 					linhas1.append(linha)
 		if(bloco): #Se terminar as linhas e ainda estiver num bloco, tem má formação
-			output.write(str(linhaBloco)+" CoMF")
-			output.write('\n')
+			erros.append(str(linhaBloco)+" CoMF \n")
 		
-		print("PROSS")
-		print(linhas1)
 		numLinha = 0
 		cadeia = False
 
-		#Verifica as palavras q restaram
+		#Classifica as palavras q restaram
 		for linha in linhas1:
 			palavras = []
 			numLinha+=1
@@ -144,17 +142,38 @@ for file in names_arq:
 
 				result_DEL = aut_delimitador.automato_delimitador(palavra)
 				result_IDE = aut_identi.automato_identificador(palavra)
+				print(result_IDE[0])
 				result_NRO = aut_numero.automato_numeros(palavra)
 				result_CAD = aut_cadeia.automato_cadeia(palavra)
-				if(result_IDE !='0'):
-					result = result_IDE
-				elif (result_NRO !='0'):
-					result = result_NRO
-				elif (result_DEL !='0'):
-					result = result_DEL
-				elif (result_CAD !='0'):
-					result = result_CAD
+				if(result_IDE[0] !='0'):
+					if(result_IDE[0] == '1'):
+						erros.append(str(numLinha)+" "+result_IDE[1])
+					else:
+						result = result_IDE[1]
+				elif (result_NRO[0] !='0'):
+					if(result_NRO[0] == '1'):
+						erros.append(str(numLinha)+" "+result_NRO[1])
+					else:
+						result = result_NRO[1]
+				elif (result_DEL[0] !='0'):
+					if(result_DEL[0] == '1'):
+						erros.append(str(numLinha)+" "+result_DEL[1])
+					else:
+						result = result_DEL[1]
+				elif (result_CAD[0] !='0'):
+					if(result_CAD[0] == '1'):
+						erros.append(str(numLinha)+" "+result_CAD[1])
+					else:
+						result = result_CAD[1]
+
 				if(result!=''):
 					output.write(str(numLinha)+" "+result)
 				output.write('\n')
+
+		output.write('====ERROS=====')
+		output.write('\n')
+		
+		print( erros)
+		for erro in erros:
+			output.write(erro)
 		output.close()
