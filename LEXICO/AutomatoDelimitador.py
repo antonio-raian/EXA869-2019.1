@@ -10,7 +10,7 @@ DELIMITADORES = ['',' ', ':', ',', ';', '(',')', '[', ']', '{', '}', '\n']
 RELACIONAIS = ['=', '==', '!=', '<', '>', '<=', '>=']
 ARITMETICOS = ['+', '-', '*', '/', '++', '--']
 LOGICOS = ['&&', '||', '!']
-SIMBOLOS = ['@','#', '$', '%', '&', '?']
+SIMBOLOS = ['%', '&', '?']
 
 def automato_delimitador(palavra):
     if(palavra in DELIMITADORES):

@@ -1,0 +1,12 @@
+//teste 01 - identificadores
+
+metodo principal (  )
+{ 
+inteiro cont@dor;
+_x ;
+ 
+	salario$mes;
+
+	flag_#1, flag2 flag_3_#;
+    
+uefs_123

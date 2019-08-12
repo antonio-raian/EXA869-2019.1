@@ -14,6 +14,8 @@ def automato_identificador(palavra):
         if(i==0):
             if(carac in LETRAS):
                 i+=1
+            elif(carac in NUMEROS):
+                return ('1', "ERR_IDE "+ palavra)
             else:
                 return ('0','')    
         elif carac in LETRAS or carac in NUMEROS:

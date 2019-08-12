@@ -33,6 +33,7 @@ for file in names_arq:
 		linhas1 = []
 		bloco = False
 		linhaBloco = 0
+		tempErro = ''
 		erros = []
 
 		# Primeiro verifica se tem comentários e os remove
@@ -59,121 +60,159 @@ for file in names_arq:
 		
 		numLinha = 0
 		cadeia = False
+		relacional = False
+		aritmetico = False
 
 		#Classifica as palavras q restaram
 		for linha in linhas1:
 			palavras = []
 			numLinha+=1
 			palavra = ''
+			# print(linha)
 			for carac in linha:
-				if(cadeia):
-					palavra+=carac
-					if(carac == '"' or carac == '\n'):
-						cadeia = not cadeia
+				if(aritmetico):
+					if(carac not in ('-', '+')):
+						if(palavra!=''):
+							palavras.append(palavra)
+							palavra = ''
+						aritmetico = not aritmetico
+
+				if(relacional):
+					if(carac != '='):
 						palavras.append(palavra)
 						palavra = ''
-				else:
-					if(carac in DELIMITADORES):
-						if(palavra != ''): #Se não estiver vazia salva o que tem
+						relacional = not relacional
+
+				if(carac!='\t'):
+					if(cadeia):
+						palavra+=carac
+						if(carac == '"' or carac == '\n'):
+							cadeia = not cadeia
 							palavras.append(palavra)
 							palavra = ''
-						if(carac == ' ' and '-' in palavra and palavra[len(palavra)-1]==' '):
-							palavra += carac
-						if(carac != ' ' and carac != '\n' ):
-							palavras.append(carac)
-					elif(carac in RELACIONAIS):
-						if(len(palavra)>1):
-							palavras.append(palavra)
-							palavra = ''
-							palavra += carac
-						else:
-							if(len(palavra)==1):
-								if(palavra in RELACIONAIS and carac == '='):
-									palavra += carac
-									palavras.append(palavra)
-									palavra = ''
-								else:
-									palavras.append(palavra)
-									palavra = ''
-									palavra += carac
-							else:
+					else:
+						if(carac in DELIMITADORES):
+							if(palavra != ''): #Se não estiver vazia salva o que tem
+								palavras.append(palavra)
+								palavra = ''
+							if(carac == ' ' and '-' in palavra and palavra[len(palavra)-1]==' '):
 								palavra += carac
-					elif(carac in ARITMETICOS):
-						if(len(palavra)>1):
-							palavras.append(palavra)
-							palavra = ''
-							palavra += carac
-						else:
-							if(len(palavra)==1):
-								if(palavra == '+' and carac =='+'):
-									palavra += carac
-									palavras.append(palavra)
-									palavra = ''
-								elif(palavra == '-'):
-									if(carac == '-'):
+							if(carac != ' ' and carac != '\n' ):
+								palavras.append(carac)
+						elif(carac in RELACIONAIS):
+							relacional = not relacional
+							if(len(palavra)>1):
+								palavras.append(palavra)
+								palavra = ''
+								palavra += carac
+							else:
+								if(len(palavra)==1):
+									if(palavra in RELACIONAIS and carac == '='):
 										palavra += carac
 										palavras.append(palavra)
 										palavra = ''
-									elif(carac == ' ' or carac in NUMEROS):
-										palavra+=carac
 									else:
 										palavras.append(palavra)
 										palavra = ''
 										palavra += carac
 								else:
-									palavras.append(palavra)
-									palavra = ''
 									palavra += carac
-							else:
+						elif(carac in ARITMETICOS):
+							aritmetico = not aritmetico
+							if(len(palavra)>1):
+								palavras.append(palavra)
+								palavra = ''
 								palavra += carac
-					elif(carac == '"'):
-						if(palavra!=''):
-							palavras.append(palavra)
-							palavra = ''
-						cadeia = not cadeia
-						palavra += carac
-					else:
-						palavra += carac
-				# if(palavra!=''):
-				# 	palavras.append(palavra)
+							else:
+								if(len(palavra)==1):
+									if(palavra == '+' and carac =='+'):
+										palavra += carac
+										palavras.append(palavra)
+										palavra = ''
+									elif(palavra == '-'):
+										if(carac == '-'):
+											palavra += carac
+											palavras.append(palavra)
+											palavra = ''
+										elif(carac == ' ' or carac in NUMEROS):
+											palavra+=carac
+										else:
+											palavras.append(palavra)
+											palavra = ''
+											palavra += carac
+									elif(carac in ('*', '/')):
+										palavras.append(palavra)
+										palavras.append(carac)
+										palavra = ''
+									else:
+										palavras.append(palavra)
+										palavra = ''
+										palavra += carac
+								else:
+									palavra += carac
+						elif(carac == '"'):
+							if(palavra!=''):
+								palavras.append(palavra)
+								palavra = ''
+							cadeia = not cadeia
+							palavra += carac
+						else:
+							palavra += carac
+			
+			if(palavra!=''):
+				palavras.append(palavra)
+
+			print(palavras)
 
 			for palavra in palavras:
 				result = ''
+				sucess = False
 
 				result_DEL = aut_delimitador.automato_delimitador(palavra)
 				result_IDE = aut_identi.automato_identificador(palavra)
-				print(result_IDE[0])
 				result_NRO = aut_numero.automato_numeros(palavra)
 				result_CAD = aut_cadeia.automato_cadeia(palavra)
+				# print('DEL', result_DEL)
+				# print('IDE', result_IDE)
+				# print('NRO', result_NRO)
+				# print('CAD', result_CAD)
 				if(result_IDE[0] !='0'):
 					if(result_IDE[0] == '1'):
-						erros.append(str(numLinha)+" "+result_IDE[1])
+						tempErro=(str(numLinha)+" "+result_IDE[1])
 					else:
 						result = result_IDE[1]
-				elif (result_NRO[0] !='0'):
+						sucess = True
+				if (result_NRO[0] !='0'):
 					if(result_NRO[0] == '1'):
-						erros.append(str(numLinha)+" "+result_NRO[1])
+						tempErro=(str(numLinha)+" "+result_NRO[1])
 					else:
 						result = result_NRO[1]
-				elif (result_DEL[0] !='0'):
+						sucess = True
+				if (result_DEL[0] !='0'):
 					if(result_DEL[0] == '1'):
-						erros.append(str(numLinha)+" "+result_DEL[1])
+						tempErro=(str(numLinha)+" "+result_DEL[1])
 					else:
 						result = result_DEL[1]
-				elif (result_CAD[0] !='0'):
+						sucess = True
+				if (result_CAD[0] !='0'):
 					if(result_CAD[0] == '1'):
-						erros.append(str(numLinha)+" "+result_CAD[1])
+						tempErro=(str(numLinha)+" "+result_CAD[1])
 					else:
 						result = result_CAD[1]
+						sucess = True
+						
+				if(not sucess):
+					erros.append(tempErro)
+				else:
+					tempErro = ''
 
 				if(result!=''):
 					output.write(str(numLinha)+" "+result)
-				output.write('\n')
+					output.write('\n')
 
-		output.write('====ERROS=====')
-		output.write('\n')
+		output.write('\n====ERROS=====\n')
 		
 		print( erros)
 		for erro in erros:
-			output.write(erro)
+			output.write(erro+'\n')
 		output.close()

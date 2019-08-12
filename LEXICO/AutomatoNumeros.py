@@ -5,8 +5,10 @@ Created on Tue Apr  2 12:12:18 2019
 @author: Antonio Raian e Diogo Lima
 """
 
-def automato_numeros(palavra):
+NUMEROS = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
 
+def automato_numeros(palavra):
+    print("NUMEROS", palavra)
     tamanho = len(palavra)
     i = 0
     fim = 0
@@ -19,9 +21,9 @@ def automato_numeros(palavra):
                 fim = 1
     fim = 0
 
-    if palavra[i] in ('0', '1', '2', '3', '4', '5', '6', '7', '8', '9'):
+    if palavra[i] in NUMEROS:
         while fim < 1:
-            if palavra[i] in ('0', '1', '2', '3', '4', '5', '6', '7', '8', '9'):
+            if palavra[i] in NUMEROS:
                 i = i+1
 
                 if i == tamanho: # Fim da palavra, sucesso (não possui casas decimais) """
@@ -37,10 +39,10 @@ def automato_numeros(palavra):
                 return ('1',"ERR_NRO " + palavra)
 
 
-            if palavra[i] in ('0', '1', '2', '3', '4', '5', '6', '7', '8', '9'):
+            if palavra[i] in NUMEROS:
 
                 while fim < 1:
-                    if palavra[i] in ('0', '1', '2', '3', '4', '5', '6', '7', '8', '9'):
+                    if palavra[i] in NUMEROS:
                         i = i+1
 
                         if i == tamanho:
