@@ -1,0 +1,153 @@
+﻿
+"Name"      = 'Oxembly'
+"Version"   = '2019'
+"Start Symbol" = <programa>
+
+
+! ============================== Terminais ======================
+
+
+{String Ch}    = {Printable} - ["]
+               
+identificador = {Letter}({Alphanumeric} | '_')*
+              
+texto = '"' ({Alphanumeric} | {String Ch} | '\"')* '"'
+
+inteiro = ('-')? (' ')* ({Digit})+
+
+real = ('-')? (' ')* ({Digit})+ '.' ({Digit})+
+
+<exp_cadeia> ::= texto <exp_cadeia_aux> 
+              
+<exp_cadeia_aux> ::= '+' texto | 
+
+falso = 'falso'
+verdadeiro = 'verdadeiro'
+vazio = 'vazio'           
+
+<tipo> ::= 'inteiro' | 'real' | 'texto' | 'boleano'   
+
+<operador relacional> ::= '!=' | '==' | '<' | '>' | '<=' | '>=' | '='
+                       
+<op_logico> ::= '&&' |  '||'
+
+<boleano> ::= verdadeiro | falso
+
+! ================================== Rules ======================================!
+
+<expressoes> ::= <exp_soma> | <exp_relacional> | <exp_logica>
+              
+! ================== PARTE DE SOMA ===============
+
+
+<exp_soma> ::=   <exp_mul> <exp_art_aux>
+<exp_art_aux>::= <sinal1> <exp_soma> | '++' | '--' |
+<sinal1>::= '+' | '-' |
+<exp_mul> ::=  <exp_parenteses> <exp_art_aux2>
+<exp_art_aux2>::= <sinal2> <exp_mul> | 
+<sinal2>::= '*' | '/'
+<exp_parenteses> ::= '(' <expressoes> ')' | <variavel> | real
+                  
+! ================== PARTE DE EXP RELACIONAL ===============
+
+<exp_relacional> ::= <id ou num> <operador relacional> <id ou num>
+<exp_relacional_not> ::= <exp_relacional> | '!' <exp_relacional>
+                   
+! ================== PARTE DE EXP LOGICA ===============
+
+<boleano_aux_1> ::= <boleano> | '!'<boleano>         
+<boleano_aux_2> ::= <variavel> | '!'<variavel>
+<boleano_aux> ::= <boleano_aux_1> | <boleano_aux_2>                                
+<exp_logica_aux> ::= '!' '('<exp_logica_aux_2>')' | '(' <exp_logica_aux_2> ')' | <exp_logica_aux_2>
+<exp_logica_aux_3> ::= <boleano_aux> | <exp_relacional_not>
+<exp_logica_aux_2> ::=  <exp_logica_aux_3> <op_logico> <exp_logica_aux_3>
+<exp_logica> ::= <exp_logica_aux> <exp_logica_recurrency>
+<exp_logica_recurrency> ::=  <op_logico> <exp_logica> |
+                         
+
+! ================== PARTE DE CONSTANTES ===============
+
+<constantes> ::= 'constantes' '{' <corpo_constantes> '}'
+              
+<corpo_constantes> ::= <tipo> identificador '=' <valor_atribuido> <prox_declaracao_constante> | 
+                    
+<prox_declaracao_constante> ::= ',' identificador '=' <valor_atribuido> <prox_declaracao_constante> | ';' <corpo_constantes>  
+                             
+<valor_atribuido> ::=  inteiro | real | <boleano> | texto
+
+! ================== PARTE DE DECLARAÇÃO DE METODOS ===============
+                   
+<parametro> ::= <tipo> identificador <parametro_aux>
+<parametro_aux> ::= ',' <parametro> |
+            
+<corpo_metodo> ::= <bloco_de_variaveis> <comandos> 'resultado'  <resultado_do_metodo> ';'
+
+<metodo> ::= 'metodo' identificador '(' <parametro> ')' ':' <tipo_retorno> <corpo_metodo>
+
+<metodo_aux> ::= <corpo_bloco_metodo> |
+
+<corpo_bloco_metodo> ::= <metodo> <metodo_aux>  
+
+<metodos> ::= 'metodos' '{' <corpo_bloco_metodo> '}'
+
+<resultado_do_metodo> ::= <variavel> | 'vazio'
+
+<comandos_aux> ::= <leia> | <escreva> | <atribuicao> | <lacos> | <condicionais> | <chamada_de_metodo>
+<comandos> ::= <comandos_aux> <comandos> |
+
+<tipo_retorno> ::= inteiro | real | texto | <boleano> | vazio 
+
+! ================== PARTE DE LEITURA E ESCRITA ===============
+             
+<impresso> ::= <variavel> | <exp_cadeia>
+<impresso_aux> ::= ','<impresso><impresso_aux> | 
+<escreva> ::= escreva '(' <impresso> <impresso_aux>  ')'';'
+
+<leitura> ::= <variavel>
+<leitura_aux> ::= ','<leitura><leitura_aux> | 
+<leia> ::= 'leia' '(' <leitura><leitura_aux> ')' ';'
+
+! ================== PARTE DE CONDICIONAIS ===============
+           
+<condicional_else> ::= 'senao' '{' <corpo_metodo> '}' |
+<condicionais> ::= 'se' <exp_logica> 'entao' '{' <corpo_metodo> '}' <condicional_else>
+<lacos> ::= 'enquanto' <exp_logica> 'entao' '{' <corpo_metodo> '}'
+              
+<id ou num> ::= identificador | real | inteiro
+             
+! ================== PARTE DA ESTRUTURA ===============
+
+<programa> ::= 'programa' '{' <corpo_code> '}'
+<corpo_code> ::= <constantes> <metodos> <principal>
+<principal> ::= 'principal' '{' <corpo_metodo> '}'
+
+<atribuicoes> ::= <atribuicao>
+
+! ================== PARTE DA CHAMADA DE METODO ===============
+
+               
+<chamada_de_metodo> ::= identificador '(' <parametro_chamada> ')' ';'
+<parametro_chamada> ::= <variavel> <parametro_chamada_aux>
+<parametro_chamada_aux> ::= ',' <parametro_chamada> | 
+
+! ================== PARTE DE VARIAVEIS ===============
+
+<bloco_de_variaveis> ::= 'variaveis' '{' <corpo_variaveis> '}' 
+<corpo_variaveis> ::= <tipo> <variavel> <prox_declaracao> | 
+<prox_declaracao> ::= ',' <variavel> <prox_declaracao> | ';' <corpo_variaveis>
+<variavel> ::= identificador <extensao_vetor>
+
+
+<extensao_vetor> ::= '[' <id ou num> ']' <extensao matriz> |
+
+<extensao matriz> ::= '[' <id ou num> ']' |
+
+<atribuiveis> ::= <expressoes> | inteiro | <boleano> | vazio
+
+<atribuicao> ::= <variavel> '=' <atribuiveis> ';'
+
+! ----- <constantes> é o bloco de constantes. Pode existir ou não, então <constantes> gera o próprio bloco, ou nada (vazio)
+
+! ----- <metodos> é o bloco de métodos. Podem haver zero ou mais métodos aqui, então ele pode gerar métodos, ou nada (vazio).
+
+! ----- <principal> é o corpo do código. Acredito ser muito parecido ou idêntico a um método. A diferença é que ele deve ter o nome de 'principal'. Deve sempre haver um principal.
