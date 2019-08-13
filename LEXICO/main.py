@@ -27,8 +27,7 @@ for file in names_arq:
 	numLinha = 0
 	coment = 0
 	print(diretorio+file)
-	nomeArqAtual = os.path.basename(file)
-	output = open(diretorioSaida + 'Saída_'+file, 'w')
+	output = open(diretorioSaida + 'Lexico_'+file, 'w')
 
 	with open(diretorio+file) as arq:
 		linhas = arq.readlines()
@@ -49,7 +48,6 @@ for file in names_arq:
 			else:
 				if(comentRes == 0): #Deu erro na formação de comentario
 					output.write(str(numLinha)+" CoMF")
-					output.write('\n')
 				elif(comentRes == 1): #Encontrou comentário de linha
 					linhas1.append(linha[:linha.index('//')]) #Pega a linha até o comentario aparecer
 				elif(comentRes == 2): #Encontrou comentário de bloco
@@ -222,12 +220,11 @@ for file in names_arq:
 					tempErro = ''
 
 				if(result!=''):
-					output.write(str(numLinha)+" "+result)
-					output.write('\n')
-
-		output.write('\n====ERROS=====\n')
-		
-		print( erros)
-		for erro in erros:
-			output.write(erro+'\n')
+					output.write(str(numLinha)+" "+result+'\n')
+		if(len(erros)>0):
+			output.write('\n====ERROS=====\n')
+			
+			print( erros)
+			for erro in erros:
+				output.write(erro+'\n')
 		output.close()
