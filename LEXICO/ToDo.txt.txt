@@ -1,0 +1,8 @@
+teste 1 - OK
+teste 2 - 
+teste 3 - +/-
+teste 4 - OK
+teste 5 - OK
+teste 6 - OK
+teste 7 - 
+teste 8 - OK

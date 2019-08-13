@@ -6,6 +6,8 @@ import AutomatoComentario as aut_coment
 import AutomatoNumeros as aut_numero
 import AutomatoDelimitador as aut_delimitador
 import AutomatoCadeia as aut_cadeia
+import AutomatoSimbolo as aut_simbolo
+
 #MAIN METOD
 diretorio = os.getcwd()+"/teste/"
 diretorioSaida = os.getcwd()+"/resultados/"
@@ -19,7 +21,7 @@ DELIMITADORES = ['',' ', ':', ',', ';', '(',')', '[', ']', '{', '}', '\n']
 NUMEROS = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
 RELACIONAIS = ['=', '<', '>', '!'] #'==', '!=', '<=', '>='
 ARITMETICOS = ['+', '-', '*', '/'] #'++', '--'
-SIMBOLOS = ['@','#', '$', '%', '&', '?']  #'&&', '||'
+SIMBOLOS = ['@','#', '$', '%', '&', '?', '|']  #'&&', '||'
 
 for file in names_arq:
 	numLinha = 0
@@ -56,10 +58,11 @@ for file in names_arq:
 				elif(comentRes == 3): #Não possui comentário na linha
 					linhas1.append(linha)
 		if(bloco): #Se terminar as linhas e ainda estiver num bloco, tem má formação
-			erros.append(str(linhaBloco)+" CoMF \n")
+			erros.append(str(linhaBloco)+" CoMF Não fechou comentário de bloco\n")
 		
 		numLinha = 0
 		cadeia = False
+		barra = False
 		relacional = False
 		aritmetico = False
 
@@ -86,10 +89,15 @@ for file in names_arq:
 				if(carac!='\t'):
 					if(cadeia):
 						palavra+=carac
-						if(carac == '"' or carac == '\n'):
-							cadeia = not cadeia
-							palavras.append(palavra)
-							palavra = ''
+						if(not barra):
+							if(carac == '\\'):
+								barra = True
+							elif(carac == '"' or carac == '\n'):
+								cadeia = not cadeia
+								palavras.append(palavra)
+								palavra = ''
+						else:
+							barra = False
 					else:
 						if(carac in DELIMITADORES):
 							if(palavra != ''): #Se não estiver vazia salva o que tem
@@ -172,29 +180,36 @@ for file in names_arq:
 				result_IDE = aut_identi.automato_identificador(palavra)
 				result_NRO = aut_numero.automato_numeros(palavra)
 				result_CAD = aut_cadeia.automato_cadeia(palavra)
+				result_SIM = aut_simbolo.automato_simbolo(palavra)
 				# print('DEL', result_DEL)
 				# print('IDE', result_IDE)
 				# print('NRO', result_NRO)
 				# print('CAD', result_CAD)
-				if(result_IDE[0] !='0'):
+				if (result_SIM[0] !='0'):
+					if(result_SIM[0] == '1'):
+						tempErro=(str(numLinha)+" "+result_SIM[1])
+					else:
+						result = result_SIM[1]
+						sucess = True
+				if(not sucess and result_IDE[0] !='0'):
 					if(result_IDE[0] == '1'):
 						tempErro=(str(numLinha)+" "+result_IDE[1])
 					else:
 						result = result_IDE[1]
 						sucess = True
-				if (result_NRO[0] !='0'):
+				if (not sucess and result_NRO[0] !='0'):
 					if(result_NRO[0] == '1'):
 						tempErro=(str(numLinha)+" "+result_NRO[1])
 					else:
 						result = result_NRO[1]
 						sucess = True
-				if (result_DEL[0] !='0'):
+				if (not sucess and result_DEL[0] !='0'):
 					if(result_DEL[0] == '1'):
 						tempErro=(str(numLinha)+" "+result_DEL[1])
 					else:
 						result = result_DEL[1]
 						sucess = True
-				if (result_CAD[0] !='0'):
+				if (not sucess and result_CAD[0] !='0'):
 					if(result_CAD[0] == '1'):
 						tempErro=(str(numLinha)+" "+result_CAD[1])
 					else:

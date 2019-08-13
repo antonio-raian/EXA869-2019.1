@@ -8,7 +8,6 @@ Created on Tue Apr  2 12:12:18 2019
 NUMEROS = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
 
 def automato_numeros(palavra):
-    print("NUMEROS", palavra)
     tamanho = len(palavra)
     i = 0
     fim = 0

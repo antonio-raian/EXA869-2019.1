@@ -10,7 +10,7 @@ DELIMITADORES = ['',' ', ':', ',', ';', '(',')', '[', ']', '{', '}', '\n']
 RELACIONAIS = ['=', '==', '!=', '<', '>', '<=', '>=']
 ARITMETICOS = ['+', '-', '*', '/', '++', '--']
 LOGICOS = ['&&', '||', '!']
-SIMBOLOS = ['%', '&', '?']
+# SIMBOLOS = ['%', '&', '?']
 
 def automato_delimitador(palavra):
     if(palavra in DELIMITADORES):
@@ -21,7 +21,6 @@ def automato_delimitador(palavra):
         return ('2',"ARI " + palavra)
     elif (palavra in LOGICOS):
         return ('2',"LOG " + palavra)
-    elif (palavra in SIMBOLOS):
-        return ('2',"SIM " + palavra)
-    else:
-        return ('0', '')
+    # elif (palavra in SIMBOLOS):
+    #     return ('2',"SIM " + palavra)
+    return ('0', '')
