@@ -12,6 +12,8 @@ def automato_numeros(palavra):
     i = 0
     fim = 0
     if palavra[i] == '-': #Verifica se tem um menos no começo da funcao
+        if(len(palavra)<2):
+            return('1', 'ERR_NRO ' + palavra)
         i = i+1
         while fim < 1: #Ignora os espaços entre o - e o numero
             if palavra[i] == ' ':
@@ -49,7 +51,7 @@ def automato_numeros(palavra):
                     else:
                         return ('1',"ERR_NRO " + palavra) #""" Erro, caractere diferente de número após a primeira casa decimal """
             else:
-                return ('1',"ERRO DE IMPLEMENTAÇÃO DO SCANNER (Passou lexema sem usar . como delimitador" + palavra) #""" Erro, caractere diferente de número após o ponto """
+                return ('1',"ERR_NRO " + palavra) #""" Erro, caractere diferente de número após o ponto """
         else:
             return ('1',"ERR_NRO " + palavra) #""" Erro, algo diferente de um ponto depois do último número inteiro """
     else:

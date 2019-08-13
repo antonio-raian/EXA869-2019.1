@@ -4,6 +4,7 @@ Created on Tue Apr  9 2019
 
 @author: Antonio Raian e Diogo Lima
 """
+ARITMETICOS = ['+', '-', '*', '/', '++', '--']
 SIMBOLOS = ['@','#', '$', '%', '&', '?', '|']  #'&&', '||'
 
 def automato_simbolo(palavra):
@@ -14,5 +15,11 @@ def automato_simbolo(palavra):
             return ('2',"LOG " + palavra)
         if(palavra[0]=='|' and palavra[len(palavra)-1] == '|'):
             return ('2',"LOG " + palavra)
+    #     if(palavra[0]=='+' and palavra[len(palavra)-1] == '+'):
+    #         return ('2',"ARI " + palavra)
+    #     if(palavra[0]=='-' and palavra[len(palavra)-1] == '-'):
+    #         return ('2',"ARI " + palavra)
+    # else:    
+    #     return ('2',"ARI " + palavra)
     
     return ('1',"ERR_SIM " + palavra)
