@@ -108,7 +108,7 @@ def analisa_tipo():
 	global tokens
 	backup = tokens
 
-	if tokens[1][2] == "inteiro\n" || "real\n" || "texto\n" || "boleano\n":
+	if (tokens[1][2] == "inteiro\n") or (tokens[1][2] == "real\n") or (tokens[1][2] == "texto\n") or (tokens[1][2] == "boleano\n"):
 		tokens = tokens[1:]
 
 		return true
@@ -123,7 +123,7 @@ def analisa_valor_atribuido():
 		tokens = tokens[1:]
 
 		return true
-	elif tokens[1][1] == "CAD" | "NRO":
+	elif (tokens[1][1] == "CAD") or (tokens[1][1] == "NRO"):
 		tokens = tokens[1:]
 
 		return true
@@ -135,7 +135,7 @@ def analisa_boleano():
 	global tokens
 	backup = tokens
 
-	if tokens[1][2] == "verdadeiro\n" || "falso\n":
+	if (tokens[1][2] == "verdadeiro\n") or (tokens[1][2] == "falso\n"):
 		tokens = tokens[1:]
 
 		return true
