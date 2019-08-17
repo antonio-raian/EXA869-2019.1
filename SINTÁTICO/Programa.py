@@ -1,4 +1,5 @@
 tokens = ""
+erros = ""
 
 def main(lista_tokens):
     global tokens
@@ -30,22 +31,26 @@ def analisa_programa():
 		if tokens[1][2] == esperado
 			tokens = tokens[1:]
 
-			if analisa_corpo_code():
+			analisa_corpo_code():
 
-				esperado = "}\n"
+			esperado = "}\n"
 
-				if tokens[1][2] == esperado
-					tokens = tokens[1:]
+			if tokens[1][2] == esperado
+				tokens = tokens[1:]
+
+				return true
+	return false				
 
 
 def analisa_corpo_code():
 	global tokens
 	backup = tokens
 
-	if analisa_constantes():
-		if analisa_bloco_de_metodos():
-			if analisa_principal():
-				return true
+	analisa_constantes():
+	analisa_bloco_de_metodos():
+	analisa_principal():
+	
+	return true
 
 
 def analisa_constantes():
@@ -62,35 +67,36 @@ def analisa_constantes():
 		if tokens[1][2] == esperado
 			tokens = tokens[1:]
 
-			if analisa_corpo_constantes():
+			analisa_corpo_constantes():
 
-				esperado = "}\n"
+			esperado = "}\n"
 
-				if tokens[1][2] == esperado
-					tokens = tokens[1:]
+			if tokens[1][2] == esperado
+				tokens = tokens[1:]
 
-					return true
+				return true
+	return false			
 
 
 def analisa_corpo_constantes():		#ACEITA VAZIO. PORTANTO, DEVE PODER RETORNAR AO BACKUP CASO ENCONTRE ERRO.		
 	global tokens
 	backup = tokens
 
-	if analisa_tipo():
-		esperado = "IDE"
+	analisa_tipo():
+	esperado = "IDE"
 
-		if tokens[1][1] == esperado:
+	if tokens[1][1] == esperado:
+		tokens = tokens[1:]
+
+		esperado = "=\n"
+		if tokens[1][2] == esperado:
 			tokens = tokens[1:]
 
-			esperado = "=\n"
-			if tokens[1][2] == esperado:
-				tokens = tokens[1:]
+			analisa_valor_atribuido():
 
-				if analisa_valor_atribuido():
+			analisa_prox_declaracao_constantes():
 
-					if analisa_prox_declaracao_constantes():
-
-						return true
+			return true
 	#SE ALGUMA DAS CONDICOES NAO FOR VERDADEIRA
 
 	tokens = backup
@@ -100,9 +106,31 @@ def analisa_prox_declaracao_constantes():
 	global tokens
 	backup = tokens
 
-	#TODO
+	if tokens[1][2] == ";\n":
+		tokens = tokens[1:]
 
+		analisa_corpo_constantes()
 
+		return true
+
+	elif tokens[1][2] == ",\n":
+
+		esperado = "IDE"
+
+		if tokens[1][1] == esperado:
+			tokens = tokens[1:]
+
+			esperado = "=\n"
+
+			if tokens[1][2] == esperado:
+				tokens = tokens[1:]
+
+				analisa_valor_atribuido()
+				analisa_prox_declaracao_constantes()
+
+				return true
+
+	return false			
 
 def analisa_tipo():
 	global tokens
@@ -141,3 +169,110 @@ def analisa_boleano():
 		return true
 	else:
 		return false
+
+def analisa_bloco_de_metodos():
+
+
+def analisa_corpo_metodo():
+
+def analisa_bloco_de_variaveis():
+
+def analisa_comandos():
+
+def analisa_corpo_variavel():
+
+def analisa_variavel():
+
+def analisa_prox_declaracao():
+
+def analisa_extensao_vetor():
+
+def analisa_extensao_matriz():
+
+def analisa_id_ou_num():
+
+def analisa_comandos_aux():
+
+def analisa_leia():
+
+def analisa_leitura():
+
+def analisa_leitura_aux():
+
+def analisa_escreva():
+
+def analisa_impresso():
+
+def analisa_impresso_aux():
+
+def analisa_exp_cadeia():
+
+def analisa_exp_cadeia_aux():	
+
+def analisa_atribuicao():
+
+def analisa_atribuiveis():
+
+def analisa_expressoes():
+
+def analisa_lacos():
+
+def analisa_condicionais():
+
+def analisa_condicional_else():
+
+def analisa_chamada_de_metodo():
+
+def analisa_parametro_chamada():
+
+def analisa_parametro_chamada_aux():
+
+def analisa_principal():
+
+def analisa_metodos():
+
+def analisa_resultado_do_metodo():
+
+def analisa_tipo_retorno():
+
+def analisa_parametro():
+
+def analisa_parametro_aux():
+
+def analisa_operador_relacional():
+
+def analisa_op_logico():
+
+def analisa_exp_soma():
+
+def analisa_exp_art_aux():
+
+def analisa_sinal1():
+
+def analisa_exp_mul():
+
+def analisa_exp_art_aux2():
+
+def analisa_sinal2():
+
+def analisa_exp_parenteses():
+
+def analisa_exp_relacional():
+
+def analisa_exp_relacional_not():
+
+def analisa_boleano_aux_1():  
+
+def analisa_boleano_aux_2():
+
+def analisa_boleano_aux():   
+
+def analisa_exp_logica_aux():
+
+def analisa_exp_logica_aux_3():
+
+def analisa_exp_logica_aux_2():
+
+def analisa_exp_logica():
+
+def analisa_exp_logica_recurrency():
