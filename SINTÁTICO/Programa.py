@@ -23,34 +23,34 @@ def analisa_programa():
 
 	esperado = "programa\n"
 
-	if tokens[1][2] == esperado
+	if (tokens[1][2] == esperado):
 		tokens = tokens[1:] #<- AVANÇA PARA O PROXIMO
 
 		esperado = "{\n"
 
-		if tokens[1][2] == esperado
+		if tokens[1][2] == esperado:
 			tokens = tokens[1:]
 
-			analisa_corpo_code():
+			analisa_corpo_code()
 
 			esperado = "}\n"
 
-			if tokens[1][2] == esperado
+			if tokens[1][2] == esperado:
 				tokens = tokens[1:]
 
-				return true
-	return false				
+				return True
+	return False				
 
 
 def analisa_corpo_code():
 	global tokens
 	backup = tokens
 
-	analisa_constantes():
-	analisa_bloco_de_metodos():
-	analisa_principal():
+	analisa_constantes()
+	analisa_bloco_de_metodos()
+	analisa_principal()
 	
-	return true
+	return True
 
 
 def analisa_constantes():
@@ -59,30 +59,30 @@ def analisa_constantes():
 
 	esperado = "constantes\n"
 
-	if tokens[1][2] == esperado
+	if tokens[1][2] == esperado:
 		tokens = tokens[1:]
 
 		esperado = "{\n"
 
-		if tokens[1][2] == esperado
+		if tokens[1][2] == esperado:
 			tokens = tokens[1:]
 
-			analisa_corpo_constantes():
+			analisa_corpo_constantes()
 
 			esperado = "}\n"
 
-			if tokens[1][2] == esperado
+			if tokens[1][2] == esperado:
 				tokens = tokens[1:]
 
-				return true
-	return false			
+				return True
+	return False			
 
 
 def analisa_corpo_constantes():		#ACEITA VAZIO. PORTANTO, DEVE PODER RETORNAR AO BACKUP CASO ENCONTRE ERRO.		
 	global tokens
 	backup = tokens
 
-	analisa_tipo():
+	analisa_tipo()
 	esperado = "IDE"
 
 	if tokens[1][1] == esperado:
@@ -92,15 +92,15 @@ def analisa_corpo_constantes():		#ACEITA VAZIO. PORTANTO, DEVE PODER RETORNAR AO
 		if tokens[1][2] == esperado:
 			tokens = tokens[1:]
 
-			analisa_valor_atribuido():
+			analisa_valor_atribuido()
 
-			analisa_prox_declaracao_constantes():
+			analisa_prox_declaracao_constantes()
 
-			return true
+			return True
 	#SE ALGUMA DAS CONDICOES NAO FOR VERDADEIRA
 
 	tokens = backup
-	return true						
+	return True						
 
 def analisa_prox_declaracao_constantes():
 	global tokens
@@ -111,7 +111,7 @@ def analisa_prox_declaracao_constantes():
 
 		analisa_corpo_constantes()
 
-		return true
+		return True
 
 	elif tokens[1][2] == ",\n":
 
@@ -128,9 +128,9 @@ def analisa_prox_declaracao_constantes():
 				analisa_valor_atribuido()
 				analisa_prox_declaracao_constantes()
 
-				return true
+				return True
 
-	return false			
+	return False			
 
 def analisa_tipo():
 	global tokens
@@ -139,9 +139,9 @@ def analisa_tipo():
 	if (tokens[1][2] == "inteiro\n") or (tokens[1][2] == "real\n") or (tokens[1][2] == "texto\n") or (tokens[1][2] == "boleano\n"):
 		tokens = tokens[1:]
 
-		return true
+		return True
 	else:
-		return false
+		return False
 
 def analisa_valor_atribuido():
 	global tokens
@@ -150,13 +150,13 @@ def analisa_valor_atribuido():
 	if analisa_boleano():
 		tokens = tokens[1:]
 
-		return true
+		return True
 	elif (tokens[1][1] == "CAD") or (tokens[1][1] == "NRO"):
 		tokens = tokens[1:]
 
-		return true
+		return True
 	else:
-		return false	
+		return False	
 
 
 def analisa_boleano():
@@ -166,113 +166,224 @@ def analisa_boleano():
 	if (tokens[1][2] == "verdadeiro\n") or (tokens[1][2] == "falso\n"):
 		tokens = tokens[1:]
 
-		return true
+		return True
 	else:
-		return false
+		return False
 
 def analisa_bloco_de_metodos():
-
-
+	return True
 def analisa_corpo_metodo():
-
+	return True
 def analisa_bloco_de_variaveis():
-
+	return True
 def analisa_comandos():
-
+	return True
 def analisa_corpo_variavel():
-
+	return True
 def analisa_variavel():
-
+	return True
 def analisa_prox_declaracao():
-
+	return True
 def analisa_extensao_vetor():
-
+	return True
 def analisa_extensao_matriz():
-
+	return True
 def analisa_id_ou_num():
+	global tokens
+	if(tokens[1][1] =='IDE\n' or tokens[1][1]=='NRO'):
+		return True
+	return False
 
 def analisa_comandos_aux():
+	return True
 
 def analisa_leia():
+	return True
 
 def analisa_leitura():
+	return True
 
 def analisa_leitura_aux():
+	return True
 
 def analisa_escreva():
+	return True
 
 def analisa_impresso():
+	return True
 
 def analisa_impresso_aux():
+	return True
 
 def analisa_exp_cadeia():
+	return True
 
 def analisa_exp_cadeia_aux():	
+	return True
 
 def analisa_atribuicao():
+	return True
 
 def analisa_atribuiveis():
+	return True
 
 def analisa_expressoes():
+	return True
 
 def analisa_lacos():
+	return True
 
 def analisa_condicionais():
+	return True
 
 def analisa_condicional_else():
+	return True
 
 def analisa_chamada_de_metodo():
+	return True
 
 def analisa_parametro_chamada():
+	return True
 
 def analisa_parametro_chamada_aux():
+	return True
 
 def analisa_principal():
+	return True
 
 def analisa_metodos():
+	return True
 
 def analisa_resultado_do_metodo():
+	return True
 
 def analisa_tipo_retorno():
+	return True
 
 def analisa_parametro():
+	global tokens
+	analisa_tipo()
+	if(token[1][1]=='IDE\n'):
+		return analisa_parametro_aux()
+	else:
+		return False
 
 def analisa_parametro_aux():
+	global tokens
+	if(tokens[1][2]==',\n'):
+		tokens = tokens[1:]
+		return analisa_parametro()
+	else:
+		return True
 
 def analisa_operador_relacional():
+	global tokens
+	if(tokens[1][2] == '!=\n' or tokens[1][2] == '==\n' or tokens[1][2] ==  '<\n' or tokens[1][2] == '>\n' or tokens[1][2] ==  '<=\n' or tokens[1][2] ==  '>=\n' or tokens[1][2] ==  '=\n'):
+		tokens = tokens[1:]
+		return True
+	return False
 
 def analisa_op_logico():
+	global tokens
+	if(tokens[1][2] == '&&\n') or (tokens[1][2] == '||\n'):
+		tokens = tokens[1:]
+		return True
+	return False
 
 def analisa_exp_soma():
+	return analisa_exp_mul() and analisa_exp_art_aux()
 
 def analisa_exp_art_aux():
+	global tokens
+	if(tokens[1][2] == '++\n' or tokens[1][2] == '--\n'):
+		tokens = tokens[1:]
+		return True
+	else:
+		return (analisa_sinal1() and analisa_exp_soma()) or True
 
 def analisa_sinal1():
+	global tokens
+	if(tokens[1][2] == '+\n' or tokens[1][2] == '-\n'):
+		tokens = tokens[1:]
+		return True
+	return False
 
 def analisa_exp_mul():
+	return analisa_exp_parenteses() and analisa_exp_art_aux2()
 
 def analisa_exp_art_aux2():
+	return (analisa_sinal2() and analisa_exp_mul()) or True
 
 def analisa_sinal2():
+	global tokens
+	if(tokens[1][2] == '*\n' or tokens[1][2 == '/\n']):
+		tokens = tokens[1:]
+		return True
+	return False
 
 def analisa_exp_parenteses():
+	global tokens
+	if(tokens[1][2] == '(\n'):
+		tokens = tokens[1:]
+		analisa_expressoes()
+		if(tokens[1][2]==')\n'):
+			tokens = tokens[1:]
+			return True
+	elif (tokens[1][1]=='NRO\n'):
+		tokens = tokens[1:]
+		return True
+	else:
+		return analisa_variavel()
 
+	return False
+	
 def analisa_exp_relacional():
+	return analisa_id_ou_num() and analisa_operador_relacional() and analisa_id_ou_num()
 
 def analisa_exp_relacional_not():
+	global tokens
+	if( tokens[1][2] == '!\n' ):
+		tokens = tokens[1:]
+	return analisa_exp_relacional()
+	return True
 
-def analisa_boleano_aux_1():  
+def analisa_boleano_aux_1():
+	global tokens
+	if( tokens[1][2] == '!\n' ):
+		tokens = tokens[1:]
+	return analisa_boleano()
 
 def analisa_boleano_aux_2():
+	global tokens
+	if( tokens[1][2] == '!\n' ):
+		tokens = tokens[1:]
+	return analisa_variavel()
 
 def analisa_boleano_aux():   
+	return analisa_boleano_aux_1() or analisa_boleano_aux_2()
 
 def analisa_exp_logica_aux():
+	global tokens
+	if (tokens[1][2] == "!\n") or (tokens[1][2] == "(\n"):
+		tokens = tokens[1:]
+		if (tokens[1][2] == "(\n"):
+			tokens = tokens[1:]
+
+	analisa_exp_logica_aux_2()
+
+	if(tokens[1][2] == ")\n"):
+		tokens = tokens[1:]
+
+	return True
 
 def analisa_exp_logica_aux_3():
+	return analisa_boleano_aux() or analisa_exp_relacional_not()
 
 def analisa_exp_logica_aux_2():
+	return analisa_exp_logica_aux_3() and analisa_op_logico() and analisa_exp_logica_aux_3()
 
-def analisa_exp_logica():
+def analisa_exp_logica():	
+	return analisa_exp_logica_aux() and analisa_exp_logica_recurrency()
 
 def analisa_exp_logica_recurrency():
+	return (analisa_op_logico() and analisa_exp_logica()) or True

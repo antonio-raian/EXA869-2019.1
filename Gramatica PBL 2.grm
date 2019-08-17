@@ -82,13 +82,7 @@ vazio = 'vazio'
             
 <corpo_metodo> ::= <bloco_de_variaveis> <comandos> 'resultado'  <resultado_do_metodo> ';'
 
-<metodo> ::= 'metodo' identificador '(' <parametro> ')' ':' <tipo_retorno> <corpo_metodo>
-
-<metodo_aux> ::= <corpo_bloco_metodo> |
-
-<corpo_bloco_metodo> ::= <metodo> <metodo_aux>  
-
-<metodos> ::= 'metodos' '{' <corpo_bloco_metodo> '}'
+<metodos> ::= 'metodo' identificador '(' <parametro> ')' ':' <tipo_retorno> '{' <corpo_metodo> '}' <metodos> | 
 
 <resultado_do_metodo> ::= <variavel> | 'vazio'
 
