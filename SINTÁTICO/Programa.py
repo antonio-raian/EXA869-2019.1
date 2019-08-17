@@ -237,28 +237,119 @@ def analisa_condicionais():
 	return True
 
 def analisa_condicional_else():
+	global tokens
+	if(tokens[1][2] == 'senao\n'):
+		tokens = tokens[1:]
+		if(tokens[1][2] == '{\n'):
+			tokens = tokens[1:]
+			analisa_corpo_metodo()
+			if(tokens[1][2]=='}\n'):
+				tokens = tokens[1:]
+				return True
+			else:
+				return False
+		else:
+			return False
 	return True
 
 def analisa_chamada_de_metodo():
-	return True
+	global tokens
+	if(tokens[1][1] == 'IDE\n'):
+		tokens = tokens[1:]
+		if(tokens[1][2] == '(\n'):
+			tokens = tokens[1:]
+			analisa_parametro_chamada()
+			if(tokens[1][2] == ')\n'):
+				tokens = tokens[1:]
+				if(tokens[1][2] == ';\n'):
+					tokens = tokens[1:]
+					return True
+				else:
+					return False
+			else:
+				return False
+		else:
+			return False
+	else:
+		return False
 
 def analisa_parametro_chamada():
-	return True
+	return analisa_variavel() and analisa_parametro_chamada_aux()
 
 def analisa_parametro_chamada_aux():
-	return True
+	global tokens
+	if(tokens[1][2] == ',\n'):
+		tokens = tokens[1:]
+		return analisa_parametro_chamada()
+	else:
+		return True
 
 def analisa_principal():
-	return True
+	global tokens
+	if(tokens[1][2] == 'principal\n'):
+		tokens = tokens[1:]
+		if(tokens[1][2] == '{\n'):
+			tokens = tokens[1:]
+			analisa_corpo_metodo()
+			if(tokens[1][2] == '}\n'):
+				tokens = tokens[1:]
+				return True
+			else:
+				return False
+		else:
+			return False
+	else:
+		return False
 
 def analisa_metodos():
+	global tokens
+	if(tokens[1][2] == 'metodo\n'):
+		tokens = tokens[1:]
+		if(tokens[1][1] == 'IDE\n'):
+			tokens = tokens[1:]
+			if(tokens[1][2] == '(\n'):
+				tokens = tokens[1:]
+				analisa_parametro()
+				if(tokens[1][2] == ')\n'):
+					tokens = tokens[1:]
+					if(tokens[1][2] == ':\n'):
+						tokens = tokens[1:]
+						analisa_tipo_retorno()
+						if(tokens[1][2] == '{\n'):
+							tokens = tokens[1:]
+							analisa_corpo_metodo()
+							if(tokens[1][2] == '}\n'):
+								tokens = tokens[1:]
+								return analisa_metodos()
+							else:
+								return False
+						else:
+							return False
+					else:
+						return False
+				else:
+					return False
+			else:
+				return False
+		else:
+			return False
 	return True
 
 def analisa_resultado_do_metodo():
-	return True
+	global tokens
+	if(tokens[1][2]== 'vazio\n'):
+		tokens = tokens[1:]
+		return True
+	else:
+		return analisa_variavel()
 
 def analisa_tipo_retorno():
-	return True
+	global tokens
+	if(tokens [1][1] == 'CAD\n' or tokens[1][1]=='NRO\n' or tokens[1][2]=='vazio\n'):
+		tokens = tokens[1:]
+		return True
+	else:
+		return analisa_boleano()
 
 def analisa_parametro():
 	global tokens

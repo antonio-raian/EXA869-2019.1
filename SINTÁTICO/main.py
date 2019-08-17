@@ -36,5 +36,9 @@ for file in names_arq:
                     erro_lexicos.append('Erro Lexico no arquivo: '+file)
                     break
         # print(tokens)
-        programa.main(tokens)#Chama o método que trata o inicio do programa
+        if(programa.main(tokens)):#Chama o método que trata o inicio do programa
+            print('Deu bom')
+        else:
+            print('Deu ruim')
+    
     print(erro_lexicos)
