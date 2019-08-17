@@ -207,34 +207,121 @@ def analisa_leitura_aux():
 	return True
 
 def analisa_escreva():
-	return True
+	global tokens
+	if(tokens[1][2] == 'escreva\n'):
+		tokens = tokens[1:]
+		if(tokens[1][2] == '(\n'):
+			tokens = tokens[1:]
+			analisa_impresso()
+			analisa_impresso_aux()
+			if(tokens[1][2] == ')\n'):
+				tokens = tokens[1:]
+				if(tokens[1][2] == ';\n'):
+					tokens = tokens[1:]
+					return True
+				else:
+					return False
+			else:
+				return False
+		else:
+			return False
+	else:
+		return False
 
 def analisa_impresso():
-	return True
+	return analisa_variavel() or analisa_exp_cadeia()
 
 def analisa_impresso_aux():
-	return True
+	global tokens
+	if(tokens[1][2]==',\n'):
+		tokens = tokens[1:]
+		return (analisa_impresso() and analisa_impresso_aux())
+	return True 
 
 def analisa_exp_cadeia():
-	return True
+	global tokens
+	if(tokens[1][1 == 'CAD\n']):
+		tokens = tokens[1:]
+		return analisa_exp_cadeia_aux()
+	else:
+		return False
 
-def analisa_exp_cadeia_aux():	
+def analisa_exp_cadeia_aux():
+	global tokens
+	if(tokens[1][2]=='+\n'):
+		tokens = tokens[1:]
+		if(tokens[1][1] == 'CAD\n'):
+			tokens = tokens[1:]
 	return True
 
 def analisa_atribuicao():
-	return True
+	global tokens
+	analisa_variavel()
+	if(tokens[1][2]=='='):
+		tokens = tokens[1:]
+		analisa_atribuiveis()
+		if(tokens[1][2]==';'):
+			tokens = tokens[1:]
+			return True
+		else:
+			return False
+	else:
+		return False
 
 def analisa_atribuiveis():
+	global tokens
+	if(tokens[1][2]=='vazio\n' or tokens[1][1]=='NRO\n'):
+		return True
+	else:
+		return analisa_expressoes() or analisa_boleano()
 	return True
 
 def analisa_expressoes():
-	return True
+	return analisa_exp_soma() or analisa_exp_relacional() or analisa_exp_logica()
 
 def analisa_lacos():
-	return True
+	global tokens
+	if(tokens[1][2] == 'enquanto\n'):
+		tokens = tokens[1:]
+		analisa_exp_logica()
+		if(tokens[1][2] == 'entao\n'):
+			tokens = tokens[1:]
+			if(tokens[1][2] == '{\n'):
+				tokens = tokens[1:]
+				analisa_corpo_metodo()
+				if(tokens[1][2] == '}\n'):
+					tokens = tokens[1:]
+					return True
+				else:
+					return False
+			else:
+				return False
+		else:
+			return False
+	else:
+		return False
 
 def analisa_condicionais():
-	return True
+	global tokens
+	if(tokens[1][2] == 'se\n'):
+		tokens = tokens[1:]
+		analisa_exp_logica()
+		if(tokens[1][2] == 'entao\n'):
+			tokens = tokens[1:]
+			if(tokens[1][2] == '{\n'):
+				tokens = tokens[1:]
+				analisa_corpo_metodo()
+				if(tokens[1][2] == '}\n'):
+					tokens = tokens[1:]
+					return analisa_condicional_else()
+				else:
+					return False
+			else:
+				return False
+		else:
+			return False
+	else:
+		return False
 
 def analisa_condicional_else():
 	global tokens
