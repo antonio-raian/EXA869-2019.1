@@ -172,22 +172,31 @@ def analisa_boleano():
 
 def analisa_bloco_de_metodos():
 	return True
+	
 def analisa_corpo_metodo():
 	return True
+	
 def analisa_bloco_de_variaveis():
 	return True
+	
 def analisa_comandos():
 	return True
+	
 def analisa_corpo_variavel():
 	return True
+	
 def analisa_variavel():
 	return True
+	
 def analisa_prox_declaracao():
 	return True
+	
 def analisa_extensao_vetor():
 	return True
+	
 def analisa_extensao_matriz():
 	return True
+	
 def analisa_id_ou_num():
 	global tokens
 	if(tokens[1][1] =='IDE\n' or tokens[1][1]=='NRO'):
@@ -195,15 +204,38 @@ def analisa_id_ou_num():
 	return False
 
 def analisa_comandos_aux():
-	return True
+	return analisa_leia() or analisa_escreva() or analisa_atribuicao() or analisa_lacos() or analisa_condicionais() or analisa_chamada_de_metodo()
 
 def analisa_leia():
-	return True
+	global tokens
+	if(tokens[1][2]=='leia\n'):
+		tokens = tokens[1:]
+		if(tokens[1][2]=='(\n'):
+			tokens = tokens[1:]
+			analisa_leitura()
+			analisa_leitura_aux()
+			if(tokens[1][2]==')\n'):
+				tokens = tokens[1:]
+				if(tokens[1][2]==';\n'):
+					tokens = tokens[1:]
+					return True
+				else:
+					return False
+			else:
+				return False
+		else:
+			return False
+	else:
+		return False
 
 def analisa_leitura():
-	return True
+	return analisa_variavel()
 
 def analisa_leitura_aux():
+	global tokens
+	if(tokens[1][2] == ',\n'):
+		tokens = tokens[1:]
+		return analisa_impresso() and analisa_impresso_aux()
 	return True
 
 def analisa_escreva():
