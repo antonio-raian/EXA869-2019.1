@@ -172,31 +172,70 @@ def analisa_boleano():
 
 def analisa_bloco_de_metodos():
 	return True
-	
+
 def analisa_corpo_metodo():
 	return True
-	
+
 def analisa_bloco_de_variaveis():
-	return True
-	
+	global tokens
+	if(tokens[1][2]=='variaveis\n'):
+		tokens = tokens[1:]
+		if(tokens[1][2]=='{\n'):
+			tokens = tokens[1:]
+			analisa_corpo_variavel()
+			if(tokens[1][2]=='}\n'):
+				tokens = tokens[1:]
+				return True
+			else:
+				return False
+		else:
+			return False
+	else:
+		return False
+
 def analisa_comandos():
-	return True
-	
+	return (analisa_comandos_aux() and analisa_comandos()) or True
+
 def analisa_corpo_variavel():
-	return True
-	
+	return (analisa_tipo() and analisa_variavel() and analisa_prox_declaracao()) or True
+
 def analisa_variavel():
-	return True
-	
+	global tokens
+	if(tokens[1][1]=='IDE\n'):
+		tokens = tokens[1:]
+		return analisa_extensao_vetor()
+	return False
+
 def analisa_prox_declaracao():
-	return True
-	
+	global tokens
+	if(tokens[1][2]==',\n'):
+		tokens = tokens[1:]
+		return analisa_variavel() and analisa_prox_declaracao()
+	elif(tokens[1][2]==';\n'):
+		return analisa_corpo_variavel()
+	else:
+		return False
+
 def analisa_extensao_vetor():
+	global tokens
+	if(tokens[1][2]=='[\n'):
+		tokens = tokens[1:]
+		analisa_id_ou_num()
+		if(tokens[1][2]==']\n'):
+			tokens = tokens[1:]
+			return analisa_extensao_matriz()
 	return True
-	
+
 def analisa_extensao_matriz():
+	global tokens
+	if(tokens[1][2]=='[\n'):
+		tokens = tokens[1:]
+		analisa_id_ou_num()
+		if(tokens[1][2]==']\n'):
+			tokens = tokens[1:]
+			
 	return True
-	
+
 def analisa_id_ou_num():
 	global tokens
 	if(tokens[1][1] =='IDE\n' or tokens[1][1]=='NRO'):
