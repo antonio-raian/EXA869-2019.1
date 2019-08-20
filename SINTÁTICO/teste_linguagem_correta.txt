@@ -6,11 +6,12 @@
 3 IDE lua
 3 REL =
 3 NRO 4
-3 DEL ,
+3 DEL ;
 4 PRE inteiro
 4 IDE sol
 4 REL =
 4 NRO 5
+4 DEL ;
 5 DEL }
 6 PRE metodo
 6 IDE estrela
@@ -37,3 +38,4 @@
 12 DEL ;
 13 DEL }
 14 DEL }
+
