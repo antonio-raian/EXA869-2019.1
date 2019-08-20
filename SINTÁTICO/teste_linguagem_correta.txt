@@ -6,6 +6,7 @@
 3 IDE lua
 3 REL =
 3 NRO 4
+3 DEL ,
 4 PRE inteiro
 4 IDE sol
 4 REL =
