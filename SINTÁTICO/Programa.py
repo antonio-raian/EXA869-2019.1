@@ -33,12 +33,11 @@ def analisa_programa():
 			tokens = tokens[1:]
 
 			analisa_corpo_code()
-
 			esperado = "}\n"
 
 			if tokens[0][2] == esperado:
+				#print(tokens[0])
 				tokens = tokens[1:]
-
 				return True
 	return False				
 
@@ -47,9 +46,13 @@ def analisa_corpo_code():
 	global tokens
 	backup = tokens
 
+	#print(tokens[0])
 	analisa_constantes()
+	#print(tokens[0])
 	analisa_metodos()
+
 	analisa_principal()
+	#print(tokens[0])
 	
 	return True
 
@@ -172,11 +175,12 @@ def analisa_boleano():
 		return False
 
 
-def analisa_corpo_metodo(): #############################################
+def analisa_corpo_metodo(): 
 	global tokens
 	backup = tokens
 
 	analisa_bloco_de_variaveis()
+
 	analisa_comandos()
 
 	if (tokens[0][2]=='resultado\n'):
@@ -197,9 +201,12 @@ def analisa_bloco_de_variaveis():
 	global tokens
 	if(tokens[0][2]=='variaveis\n'):
 		tokens = tokens[1:]
+
 		if(tokens[0][2]=='{\n'):
 			tokens = tokens[1:]
+
 			analisa_corpo_variavel()
+
 			if(tokens[0][2]=='}\n'):
 				tokens = tokens[1:]
 				return True
@@ -214,21 +221,32 @@ def analisa_comandos():
 	return (analisa_comandos_aux() and analisa_comandos()) or True
 
 def analisa_corpo_variavel():
-	return (analisa_tipo() and analisa_variavel() and analisa_prox_declaracao()) or True
+	analisa_tipo()
+	analisa_variavel()
+	analisa_prox_declaracao()
+
+	return True
+
+
 
 def analisa_variavel():
 	global tokens
-	if(tokens[0][1]=='IDE\n'):
+
+	if(tokens[0][1]=='IDE'):
 		tokens = tokens[1:]
 		return analisa_extensao_vetor()
 	return False
 
 def analisa_prox_declaracao():
 	global tokens
+
 	if(tokens[0][2]==',\n'):
 		tokens = tokens[1:]
-		return analisa_variavel() and analisa_prox_declaracao()
+		analisa_variavel()
+		analisa_prox_declaracao()
+		return true
 	elif(tokens[0][2]==';\n'):
+		tokens = tokens[1:]
 		return analisa_corpo_variavel()
 	else:
 		return False
@@ -255,7 +273,7 @@ def analisa_extensao_matriz():
 
 def analisa_id_ou_num():
 	global tokens
-	if(tokens[0][1] =='IDE\n' or tokens[0][1]=='NRO'):
+	if(tokens[0][1] =='IDE' or tokens[0][1]=='NRO'):
 		return True
 	return False
 
@@ -328,7 +346,7 @@ def analisa_impresso_aux():
 
 def analisa_exp_cadeia():
 	global tokens
-	if(tokens[0][1 == 'CAD\n']):
+	if(tokens[0][1 == 'CAD']):
 		tokens = tokens[1:]
 		return analisa_exp_cadeia_aux()
 	else:
@@ -338,7 +356,7 @@ def analisa_exp_cadeia_aux():
 	global tokens
 	if(tokens[0][2]=='+\n'):
 		tokens = tokens[1:]
-		if(tokens[0][1] == 'CAD\n'):
+		if(tokens[0][1] == 'CAD'):
 			tokens = tokens[1:]
 	return True
 
@@ -358,7 +376,7 @@ def analisa_atribuicao():
 
 def analisa_atribuiveis():
 	global tokens
-	if(tokens[0][2]=='vazio\n' or tokens[0][1]=='NRO\n'):
+	if(tokens[0][2]=='vazio\n' or tokens[0][1]=='NRO'):
 		return True
 	else:
 		return analisa_expressoes() or analisa_boleano()
@@ -429,7 +447,7 @@ def analisa_condicional_else():
 
 def analisa_chamada_de_metodo():
 	global tokens
-	if(tokens[0][1] == 'IDE\n'):
+	if(tokens[0][1] == 'IDE'):
 		tokens = tokens[1:]
 		if(tokens[0][2] == '(\n'):
 			tokens = tokens[1:]
@@ -480,19 +498,28 @@ def analisa_metodos():
 	global tokens
 	if(tokens[0][2] == 'metodo\n'):
 		tokens = tokens[1:]
-		if(tokens[0][1] == 'IDE\n'):
+
+		if(tokens[0][1] == 'IDE'):
 			tokens = tokens[1:]
+
 			if(tokens[0][2] == '(\n'):
 				tokens = tokens[1:]
+
 				analisa_parametro()
+
 				if(tokens[0][2] == ')\n'):
 					tokens = tokens[1:]
+
 					if(tokens[0][2] == ':\n'):
 						tokens = tokens[1:]
+
 						analisa_tipo_retorno()
+
 						if(tokens[0][2] == '{\n'):
 							tokens = tokens[1:]
+
 							analisa_corpo_metodo()
+
 							if(tokens[0][2] == '}\n'):
 								tokens = tokens[1:]
 								return analisa_metodos()
@@ -520,7 +547,7 @@ def analisa_resultado_do_metodo():
 
 def analisa_tipo_retorno():
 	global tokens
-	if(tokens [1][1] == 'CAD\n' or tokens[0][1]=='NRO\n' or tokens[0][2]=='vazio\n'):
+	if(tokens [1][1] == 'CAD' or tokens[0][1]=='NRO' or tokens[0][2]=='vazio\n'):
 		tokens = tokens[1:]
 		return True
 	else:
@@ -529,7 +556,8 @@ def analisa_tipo_retorno():
 def analisa_parametro():
 	global tokens
 	analisa_tipo()
-	if(token[1][1]=='IDE\n'):
+	if(tokens[0][1]=='IDE'):
+		tokens = tokens[1:]
 		return analisa_parametro_aux()
 	else:
 		return False
@@ -595,7 +623,7 @@ def analisa_exp_parenteses():
 		if(tokens[0][2]==')\n'):
 			tokens = tokens[1:]
 			return True
-	elif (tokens[0][1]=='NRO\n'):
+	elif (tokens[0][1]=='NRO'):
 		tokens = tokens[1:]
 		return True
 	else:
