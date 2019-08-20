@@ -1,0 +1,69 @@
+programa {
+    constantes {
+        inteiro lua = 4;
+        inteiro sol = 5;
+    }
+    metodo estrela (inteiro brilho): vazio { 
+        variaveis {
+            inteiro distancia;
+        }
+        resultado vazio;
+    }
+    principal {
+        variaveis{}
+        resultado vazio;
+    }
+}
+
+programa {
+    constantes {
+        inteiro varA = 9, varB = 8, varC = 6;
+        real varD = 9.5, varE = 1.4;
+        texto varF = "variavel F", varG = "variavel G";
+        boleano varH = verdadeiro, varI = falso;
+    }
+
+    metodo metodo1 (inteiro var1, real var2): inteiro { 
+        variaveis {
+            inteiro exemplo1[4][5], exemplo2;
+            texto exemplo3;
+            real exemplo4[6];
+        }
+
+        leia (leitura1,leitura2);
+        escreva (escrita1,"escri"+"ta2");
+
+        atrib1 = rel1 < 9;
+
+        enquanto !(verdadeiro) || (eqt1) entao{
+            variaveis{}
+
+            resultado vazio;    
+        }
+
+        se (8 < i) entao {
+            variaveis{}
+
+            resultado i;
+        }
+        senao {
+            variaveis{}
+
+            resultado vazio;
+        }
+
+        metodo1 (var1, var2);
+    }
+
+    principal {
+
+        variaveis{
+            inteiro variA[1][1];
+        }
+
+        leia (leitura1,leitura2);
+        escreva (escrita1,"escri"+"ta2");
+
+        resultado vazio;
+    }
+}
