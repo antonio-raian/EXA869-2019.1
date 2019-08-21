@@ -761,6 +761,8 @@ def analisa_exp_logica_recurrency():
 
 def salva_erro(esperado):
 	global erros
+	global tokens
+	global file
 
 	erros = tokens[0]
 
