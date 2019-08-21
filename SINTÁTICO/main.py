@@ -9,7 +9,7 @@ tokenAtual = ''
 #Lista Tokens
 #MAIN METOD
 def main():
-    diretorio = os.path.abspath('.')+"\\saida_lexico\\" #Pega os codigos de saída do lexico
+    diretorio = os.path.abspath('.')+"/saida_lexico/" #Pega os codigos de saída do lexico
     names_arq = os.listdir(diretorio)
 
     erro_lexicos = []

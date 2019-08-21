@@ -10,8 +10,8 @@ from LEXICO import AutomatoSimbolo as aut_simbolo
 
 #MAIN METOD
 def main():
-	diretorio = os.path.abspath('.')+"\\teste\\"
-	diretorioSaida = os.path.abspath('.')+"\\saida_lexico\\"
+	diretorio = os.path.abspath('.')+"/teste/"
+	diretorioSaida = os.path.abspath('.')+"/saida_lexico/"
 	if(os.path.isdir(diretorioSaida)):
 		print("Já tem a pasta de saida_lexico")
 	else:		
@@ -29,7 +29,7 @@ def main():
 		numLinha = 0
 		coment = 0
 		print(diretorio+file)
-		output = open(diretorioSaida + 'Lexico_'+file, 'w')
+		output = open(diretorioSaida + file, 'w')
 
 		with open(diretorio+file) as arq:
 			linhas = arq.readlines()

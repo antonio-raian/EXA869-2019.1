@@ -11,13 +11,10 @@ def main(lista_tokens, arq):
 	tokens = lista_tokens
 	file = arq
 	analisa_programa()    
-	print(erros)
-
 
 def analisa_programa():
 	global tokens
 	backup = tokens
-	print("a")
 
 	esperado = "programa\n"
 
@@ -28,14 +25,11 @@ def analisa_programa():
 
 		if tokens[0][2] == esperado:
 			tokens = tokens[1:]
-
 			if(analisa_corpo_code()):
 				esperado = "}\n"
-
 				if tokens[0][2] == esperado:
-					#print(tokens[0])
 					#tokens = tokens[1:]
-					print(tokens[0])
+					# print(tokens[0])
 					return True
 
 				else:
@@ -45,7 +39,6 @@ def analisa_programa():
 	else:
 		salva_erro("programa")
 	return False				
-
 
 def analisa_corpo_code():
 	global tokens
@@ -62,7 +55,6 @@ def analisa_corpo_code():
 	
 	return False
 
-
 def analisa_constantes():
 	global tokens
 	backup = tokens
@@ -74,17 +66,18 @@ def analisa_constantes():
 		esperado = "{\n"
 		if tokens[0][2] == esperado:
 			tokens = tokens[1:]
-
-			analisa_corpo_constantes()
-
 			esperado = "}\n"
-
 			if tokens[0][2] == esperado:
-				tokens = tokens[1:]
-
-			else:
-				salva_erro("}")
+				tokens = tokens[1:]				
 				return True
+			else:
+				if(analisa_corpo_constantes()):
+					if tokens[0][2] == esperado:
+						tokens = tokens[1:]				
+						return True
+
+					else:
+						salva_erro("}")
 		else:
 			salva_erro("{")
 	else:
@@ -92,31 +85,32 @@ def analisa_constantes():
 				
 	return False			
 
-
 def analisa_corpo_constantes():		#ACEITA VAZIO. PORTANTO, DEVE PODER RETORNAR AO BACKUP CASO ENCONTRE ERRO.		
 	global tokens
 	backup = tokens
 
-	analisa_tipo()
+	if(analisa_tipo()):
+		esperado = "IDE"
 
-	esperado = "IDE"
-
-	if tokens[0][1] == esperado:
-		tokens = tokens[1:]
-
-		esperado = "=\n"
-		if tokens[0][2] == esperado:
+		if tokens[0][1] == esperado:
 			tokens = tokens[1:]
 
-			analisa_valor_atribuido()
+			esperado = "=\n"
+			if tokens[0][2] == esperado:
+				tokens = tokens[1:]
 
-			analisa_prox_declaracao_constantes()
+				analisa_valor_atribuido()
 
-			return True
-	#SE ALGUMA DAS CONDICOES NAO FOR VERDADEIRA
+				analisa_prox_declaracao_constantes()
 
-	tokens = backup
-	return True						
+				return True
+		#SE ALGUMA DAS CONDICOES NAO FOR VERDADEIRA
+
+		tokens = backup
+		return True						
+	else:
+		salva_erro("inteiro, real, texto ou boleano")
+		return False
 
 def analisa_prox_declaracao_constantes():
 	global tokens
@@ -124,8 +118,8 @@ def analisa_prox_declaracao_constantes():
 	#print(tokens[0])
 	if tokens[0][2] == ";\n":
 		tokens = tokens[1:]
-
-		analisa_corpo_constantes()
+		if(tokens[0][2] != '}\n'):
+			analisa_corpo_constantes()
 
 		return True
 
@@ -163,7 +157,7 @@ def analisa_tipo():
 
 			return True
 		else:
-			salva_erro("inteiro, real, texto ou boleano")
+			# salva_erro("inteiro, real, texto ou boleano")
 			return False
 	else:
 		return False
@@ -201,25 +195,24 @@ def analisa_corpo_metodo():
 	global tokens
 	backup = tokens
 
-	analisa_bloco_de_variaveis()
-	#print(tokens[0])
-	analisa_comandos()
-	#print(tokens[0])
-	if (tokens[0][2]=='resultado\n'):
-		tokens = tokens[1:]
-
-		analisa_resultado_do_metodo()
-
-		if (tokens[0][2] == ';\n'):
+	if(analisa_bloco_de_variaveis()):
+		#print(tokens[0])
+		analisa_comandos()
+		#print(tokens[0])
+		if (tokens[0][2]=='resultado\n'):
 			tokens = tokens[1:]
 
-			return True
+			analisa_resultado_do_metodo()
+
+			if (tokens[0][2] == ';\n'):
+				tokens = tokens[1:]
+
+				return True
+			else:
+				salva_erro(";")
 		else:
-			salva_erro(";")
-	else:
-		salva_erro("resultado")
-
-
+			salva_erro("resultado")
+	
 	return False
 
 def analisa_bloco_de_variaveis():
@@ -229,8 +222,11 @@ def analisa_bloco_de_variaveis():
 
 		if(tokens[0][2]=='{\n'):
 			tokens = tokens[1:]
-
-			analisa_corpo_variavel()
+			if(tokens[0][2]=='}\n'):
+				tokens = tokens[1:]
+				return True
+			else:
+				analisa_corpo_variavel()
 
 			if(tokens[0][2]=='}\n'):
 				tokens = tokens[1:]
@@ -249,23 +245,19 @@ def analisa_comandos():
 	global tokens
 	backup = tokens
 
-
 	if (analisa_comandos_aux()):
 		if (analisa_comandos()):
 			return True
-
 
 	tokens = backup
 	return True
 
 def analisa_corpo_variavel():
-	analisa_tipo()
-	analisa_variavel()
-	analisa_prox_declaracao()
+	if(analisa_tipo()):
+		analisa_variavel()
+		analisa_prox_declaracao()
 
 	return True
-
-
 
 def analisa_variavel():
 	global tokens
@@ -275,8 +267,8 @@ def analisa_variavel():
 		analisa_extensao_vetor()
 		return True
 	else:
-		salva_erro("IDE")
-	return False
+		# salva_erro("IDE")
+		return False
 
 def analisa_prox_declaracao():
 	global tokens
@@ -330,21 +322,25 @@ def analisa_comandos_aux():
 
 	if (tokens[0][1] == 'IDE'):
 		if (tokens[1][2] == '=\n'):
-			analisa_atribuicao()
-			return True
+			if(analisa_atribuicao()):
+				return True
 		elif(tokens[1][2] == '(\n'):
-			analisa_chamada_de_metodo()
+			if(analisa_chamada_de_metodo()):
+				return True
+
+
+	if(tokens[0][2] == 'leia\n'):
+		if(analisa_leia()):
 			return True
-
-
-	if(analisa_leia()):
-		return True
-	elif(analisa_escreva()):
-		return True
-	elif(analisa_lacos()):
-		return True
-	elif(analisa_condicionais()):
-		return True
+	elif(tokens[0][2] == 'escreva\n'):
+		if(analisa_escreva()):
+			return True
+	elif(tokens[0][2] == 'enquanto\n'):
+		if(analisa_lacos()):
+			return True
+	elif(tokens[0][2] == 'se\n'):
+		if(analisa_condicionais()):
+			return True
 
 	return False
 
@@ -451,22 +447,22 @@ def analisa_exp_cadeia_aux():
 def analisa_atribuicao():
 	global tokens
 
-	print(tokens[0])
-	analisa_variavel()
-	print(tokens[0])
-	if(tokens[0][2]=='=\n'):
-		tokens = tokens[1:]
-		analisa_atribuiveis()
-		if(tokens[0][2]==';\n'):
+	if(analisa_variavel()):
+		if(tokens[0][2]=='=\n'):
 			tokens = tokens[1:]
-			return True
+			analisa_atribuiveis()
+			if(tokens[0][2]==';\n'):
+				tokens = tokens[1:]
+				return True
+			else:
+				salva_erro(";")
+				return False
 		else:
-			salva_erro(";")
+			salva_erro("=")
 			return False
 	else:
-		salva_erro("=")
+		salva_erro('variavel')
 		return False
-
 def analisa_atribuiveis(): ############################################################
 	global tokens
 	if(tokens[0][2]=='vazio\n' or tokens[0][1]=='NRO'):
@@ -616,7 +612,6 @@ def analisa_metodos():
 	global tokens
 	if(tokens[0][2] == 'metodo\n'):
 		tokens = tokens[1:]
-
 		if(tokens[0][1] == 'IDE'):
 			tokens = tokens[1:]
 
@@ -680,12 +675,15 @@ def analisa_tipo_retorno():
 
 def analisa_parametro():
 	global tokens
-	analisa_tipo()
-	if(tokens[0][1]=='IDE'):
-		tokens = tokens[1:]
-		return analisa_parametro_aux()
+	if(analisa_tipo()):
+		if(tokens[0][1]=='IDE'):
+			tokens = tokens[1:]
+			return analisa_parametro_aux()
+		else:
+			salva_erro("IDE")
+			return False
 	else:
-		salva_erro("IDE")
+		salva_erro("tipo do parametro")
 		return False
 
 def analisa_parametro_aux():
@@ -740,7 +738,7 @@ def analisa_exp_art_aux2():
 
 def analisa_sinal2():
 	global tokens
-	if(tokens[0][2] == '*\n' or tokens[0][2 == '/\n']):
+	if(tokens[0][2] == '*\n' or tokens[0][2] == '/\n'):
 		tokens = tokens[1:]
 		return True
 	return False
@@ -801,26 +799,23 @@ def analisa_exp_logica_aux():
 	return True
 
 def analisa_exp_logica_aux_3():
-	analisa_boleano_aux() 
-	analisa_exp_relacional_not()
-
-	return True
+	return analisa_boleano_aux() or analisa_exp_relacional_not()
 
 def analisa_exp_logica_aux_2():
-	analisa_exp_logica_aux_3()
-	analisa_op_logico()
-	analisa_exp_logica_aux_3()
-
-	return True
+	if(analisa_exp_logica_aux_3()):
+		if(analisa_op_logico()):
+			if(analisa_exp_logica_aux_3()):
+				return True
+	return False
 
 def analisa_exp_logica():
 	global tokens
 
-	analisa_exp_logica_aux()
-
-	analisa_exp_logica_recurrency()
-
-	return True
+	if(analisa_exp_logica_aux()):
+		analisa_exp_logica_recurrency()
+		return True
+	else:
+		return False
 
 def analisa_exp_logica_recurrency():
 	global tokens
@@ -829,6 +824,7 @@ def analisa_exp_logica_recurrency():
 	if(analisa_op_logico()):
 		if(analisa_exp_logica()):
 			return True
+
 	tokens = backup
 
 	return True
@@ -840,13 +836,14 @@ def salva_erro(esperado):
 
 	erros = tokens[0]
 
-	diretorioSaida = os.path.abspath('.')+"\\saida_sintatico\\"
-	if(os.path.isdir(diretorioSaida)):
-		print("Já tem a pasta de saida_sintatico")
-	else:
+	print('ERRO '+esperado)
+	print(erros)
+	
+	diretorioSaida = os.path.abspath('.')+"/saida_sintatico/"
+	if(not os.path.isdir(diretorioSaida)):
 		os.mkdir(diretorioSaida)
 	
-	output = open(diretorioSaida + 'Sintatico_'+file, 'w')
+	output = open(diretorioSaida +file, 'w')
 
 	linha = erros[0]
 	token = erros[1]
