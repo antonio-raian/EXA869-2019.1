@@ -1,23 +1,17 @@
 import sys
+import os
 
 file = ""
 tokens = ""
 erros = ""
 
 def main(lista_tokens, arq):
-    global tokens
-    global arq
-    tokens = lista_tokens
-    file = arq
-    #print(lista_tokens)
-    for token in lista_tokens:
-        n_linha = token[0]
-        tipo = token[1]
-        value = token[2]
-        #print('LINHA '+n_linha+ '->TIPO '+tipo+'->VALOR '+value)
-
-    analisa_programa()    
-    print(erros)
+	global tokens
+	global file
+	tokens = lista_tokens
+	file = arq
+	analisa_programa()    
+	print(erros)
 
 
 def analisa_programa():
@@ -35,17 +29,17 @@ def analisa_programa():
 		if tokens[0][2] == esperado:
 			tokens = tokens[1:]
 
-			analisa_corpo_code()
-			esperado = "}\n"
+			if(analisa_corpo_code()):
+				esperado = "}\n"
 
-			if tokens[0][2] == esperado:
-				#print(tokens[0])
-				#tokens = tokens[1:]
-				print(tokens[0])
-				return True
+				if tokens[0][2] == esperado:
+					#print(tokens[0])
+					#tokens = tokens[1:]
+					print(tokens[0])
+					return True
 
-			else:
-				salva_erro("}")
+				else:
+					salva_erro("}")
 		else:
 			salva_erro("{")
 	else:
@@ -58,14 +52,15 @@ def analisa_corpo_code():
 	backup = tokens
 
 	#print(tokens[0])
-	analisa_constantes()
-	print(tokens[0])
-	analisa_metodos()
-	print(tokens[0])
-	analisa_principal()
+	if(analisa_constantes()):
+		print(tokens[0])
+		if(analisa_metodos()):
+			print(tokens[0])
+			if(analisa_principal()):
+				return True
 	#print(tokens[0])
 	
-	return True
+	return False
 
 
 def analisa_constantes():
@@ -76,9 +71,7 @@ def analisa_constantes():
 
 	if tokens[0][2] == esperado:
 		tokens = tokens[1:]
-
 		esperado = "{\n"
-
 		if tokens[0][2] == esperado:
 			tokens = tokens[1:]
 
@@ -95,7 +88,7 @@ def analisa_constantes():
 		else:
 			salva_erro("{")
 	else:
-		salva_erro("}")
+		salva_erro("constantes")
 				
 	return False			
 
@@ -164,13 +157,15 @@ def analisa_prox_declaracao_constantes():
 def analisa_tipo():
 	global tokens
 	backup = tokens
+	if(tokens[0][1] =='PRE'):
+		if (tokens[0][2] == "inteiro\n") or (tokens[0][2] == "real\n") or (tokens[0][2] == "texto\n") or (tokens[0][2] == "boleano\n"):
+			tokens = tokens[1:]
 
-	if (tokens[0][2] == "inteiro\n") or (tokens[0][2] == "real\n") or (tokens[0][2] == "texto\n") or (tokens[0][2] == "boleano\n"):
-		tokens = tokens[1:]
-
-		return True
+			return True
+		else:
+			salva_erro("inteiro, real, texto ou boleano")
+			return False
 	else:
-		salva_erro("inteiro, real, texto ou boleano")
 		return False
 
 def analisa_valor_atribuido():
@@ -845,22 +840,21 @@ def salva_erro(esperado):
 
 	erros = tokens[0]
 
-	diretorioSaida = os.getcwd()+"/resultados/"
+	diretorioSaida = os.path.abspath('.')+"\\saida_sintatico\\"
 	if(os.path.isdir(diretorioSaida)):
-		print("Já tem a pasta de resultados")
+		print("Já tem a pasta de saida_sintatico")
 	else:
 		os.mkdir(diretorioSaida)
 	
 	output = open(diretorioSaida + 'Sintatico_'+file, 'w')
 
-
 	linha = erros[0]
 	token = erros[1]
 	valor = erros[2]
 	valor = valor[:-1] #remove o \n
-	#LOGICA DE SALVAR O ERRO NO ARQUIVO
 
-	output.write("Linha do erro: "+linha+". Recebeu <"+valor+", "+token+">, mas esperava "+esperado+".")
+	#LOGICA DE SALVAR O ERRO NO ARQUIVO
+	output.write("Linha do erro: "+linha+". Recebeu \""+valor+", "+token+"\", mas esperava \""+esperado+"\".")
 	output.close()
 
-	sys.exit("ERRO! (verificar arquivo de erros)") #finaliza o programa
+	# sys.exit("ERRO! (verificar arquivo de erros)") #finaliza o programa

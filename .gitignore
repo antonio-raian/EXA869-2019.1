@@ -2,3 +2,5 @@ __pycache__
 
 LEXICO/resultados/
 SINTÁTICO/resultados/
+saida_lexico/
+saida_sintatico/

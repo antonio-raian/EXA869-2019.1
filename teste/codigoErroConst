@@ -1,22 +1,5 @@
 programa {
-    constantes {
-        inteiro lua = 4;
-        inteiro sol = 5;
-    }
-    metodo estrela (inteiro brilho): vazio { 
-        variaveis {
-            inteiro distancia;
-        }
-        resultado vazio;
-    }
-    principal {
-        variaveis{}
-        resultado vazio;
-    }
-}
-
-programa {
-    constantes {
+    {
         inteiro varA = 9, varB = 8, varC = 6;
         real varD = 9.5, varE = 1.4;
         texto varF = "variavel F", varG = "variavel G";

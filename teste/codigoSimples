@@ -1,0 +1,16 @@
+programa {
+    constantes {
+        inteiro lua = 4;
+        inteiro sol = 5;
+    }
+    metodo estrela (inteiro brilho): vazio { 
+        variaveis {
+            inteiro distancia;
+        }
+        resultado vazio;
+    }
+    principal {
+        variaveis{}
+        resultado vazio;
+    }
+}
