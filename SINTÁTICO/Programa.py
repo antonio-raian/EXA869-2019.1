@@ -89,7 +89,14 @@ def analisa_constantes():
 			if tokens[0][2] == esperado:
 				tokens = tokens[1:]
 
+			else:
+				salva_erro("}")
 				return True
+		else:
+			salva_erro("{")
+	else:
+		salva_erro("}")
+				
 	return False			
 
 
@@ -145,6 +152,12 @@ def analisa_prox_declaracao_constantes():
 				analisa_prox_declaracao_constantes()
 
 				return True
+			else:
+				salva_erro("=")
+		else:
+			salva_erro("IDE")
+	else:
+		salva_erro("; ou ,")
 
 	return False			
 
@@ -157,6 +170,7 @@ def analisa_tipo():
 
 		return True
 	else:
+		salva_erro("inteiro, real, texto ou boleano")
 		return False
 
 def analisa_valor_atribuido():
@@ -172,6 +186,7 @@ def analisa_valor_atribuido():
 
 		return True
 	else:
+		salva_erro("verdadeiro, falso, CAD ou NRO")
 		return False	
 
 
@@ -204,7 +219,10 @@ def analisa_corpo_metodo():
 			tokens = tokens[1:]
 
 			return True
-
+		else:
+			salva_erro(";")
+	else:
+		salva_erro("resultado")
 
 
 	return False
@@ -223,10 +241,13 @@ def analisa_bloco_de_variaveis():
 				tokens = tokens[1:]
 				return True
 			else:
+				salva_erro("}")
 				return False
 		else:
+			salva_erro("{")
 			return False
 	else:
+		salva_erro("variaveis")
 		return False
 
 def analisa_comandos():
@@ -258,6 +279,8 @@ def analisa_variavel():
 		#print(tokens[0])
 		analisa_extensao_vetor()
 		return True
+	else:
+		salva_erro("IDE")
 	return False
 
 def analisa_prox_declaracao():
@@ -272,6 +295,7 @@ def analisa_prox_declaracao():
 		tokens = tokens[1:]
 		return analisa_corpo_variavel()
 	else:
+		salva_erro("; ou ,")
 		return False
 
 def analisa_extensao_vetor():
@@ -302,6 +326,8 @@ def analisa_id_ou_num():
 	if(tokens[0][1] =='IDE' or tokens[0][1]=='NRO'):
 		tokens = tokens[1:]
 		return True
+	else:
+		salva_erro("IDE ou NRO")
 	return False
 	
 def analisa_comandos_aux():
@@ -341,12 +367,16 @@ def analisa_leia():
 					tokens = tokens[1:]
 					return True
 				else:
+					salva_erro(";")
 					return False
 			else:
+				salva_erro(")")
 				return False
 		else:
+			salva_erro("(")
 			return False
 	else:
+		salva_erro("leia")
 		return False
 
 def analisa_leitura():
@@ -354,9 +384,13 @@ def analisa_leitura():
 
 def analisa_leitura_aux():
 	global tokens
+	backup = tokens
+
 	if(tokens[0][2] == ',\n'):
 		tokens = tokens[1:]
 		return analisa_impresso() and analisa_impresso_aux()
+
+	tokens = backup
 	return True
 
 def analisa_escreva():
@@ -373,12 +407,16 @@ def analisa_escreva():
 					tokens = tokens[1:]
 					return True
 				else:
+					salva_erro(";")
 					return False
 			else:
+				salva_erro(")")
 				return False
 		else:
+			salva_erro("(")
 			return False
 	else:
+		salva_erro("escreva")
 		return False
 
 def analisa_impresso():
@@ -386,9 +424,12 @@ def analisa_impresso():
 
 def analisa_impresso_aux():
 	global tokens
+	backup = tokens
+
 	if(tokens[0][2]==',\n'):
 		tokens = tokens[1:]
 		return (analisa_impresso() and analisa_impresso_aux())
+	tokens = backup
 	return True 
 
 def analisa_exp_cadeia():
@@ -397,14 +438,19 @@ def analisa_exp_cadeia():
 		tokens = tokens[1:]
 		return analisa_exp_cadeia_aux()
 	else:
+		salva_erro("CAD")
 		return False
 
 def analisa_exp_cadeia_aux():
 	global tokens
+	backup = tokens
 	if(tokens[0][2]=='+\n'):
 		tokens = tokens[1:]
 		if(tokens[0][1] == 'CAD'):
 			tokens = tokens[1:]
+			return True
+
+	tokens = backup
 	return True
 
 def analisa_atribuicao():
@@ -420,11 +466,13 @@ def analisa_atribuicao():
 			tokens = tokens[1:]
 			return True
 		else:
+			salva_erro(";")
 			return False
 	else:
+		salva_erro("=")
 		return False
 
-def analisa_atribuiveis():
+def analisa_atribuiveis(): ############################################################
 	global tokens
 	if(tokens[0][2]=='vazio\n' or tokens[0][1]=='NRO'):
 		return True
@@ -451,12 +499,16 @@ def analisa_lacos():
 
 					return True
 				else:
+					salva_erro("}")
 					return False
 			else:
+				salva_erro("{")
 				return False
 		else:
+			salva_erro("entao")
 			return False
 	else:
+		salva_erro("enquanto")
 		return False
 
 def analisa_condicionais():
@@ -477,16 +529,21 @@ def analisa_condicionais():
 					analisa_condicional_else()
 					return True
 				else:
+					salva_erro("}")
 					return False
 			else:
+				salva_erro("{")
 				return False
 		else:
+			salva_erro("entao")
 			return False
 	else:
+		salva_erro("se")
 		return False
 
 def analisa_condicional_else():
 	global tokens
+
 	if(tokens[0][2] == 'senao\n'):
 		tokens = tokens[1:]
 		if(tokens[0][2] == '{\n'):
@@ -496,8 +553,10 @@ def analisa_condicional_else():
 				tokens = tokens[1:]
 				return True
 			else:
+				salva_erro("}")
 				return False
 		else:
+			salva_erro("{")
 			return False
 	return True
 
@@ -514,12 +573,16 @@ def analisa_chamada_de_metodo():
 					tokens = tokens[1:]
 					return True
 				else:
+					salva_erro(";")
 					return False
 			else:
+				salva_erro(")")
 				return False
 		else:
+			salva_erro("(")
 			return False
 	else:
+		salva_erro("IDE")
 		return False
 
 def analisa_parametro_chamada():
@@ -529,7 +592,8 @@ def analisa_parametro_chamada_aux():
 	global tokens
 	if(tokens[0][2] == ',\n'):
 		tokens = tokens[1:]
-		return analisa_parametro_chamada()
+		analisa_parametro_chamada()
+		return True
 	else:
 		return True
 
@@ -544,10 +608,13 @@ def analisa_principal():
 				tokens = tokens[1:]
 				return True
 			else:
+				salva_erro("}")
 				return False
 		else:
+			salva_erro("{")
 			return False
 	else:
+		salva_erro("principal")
 		return False
 
 def analisa_metodos():
@@ -580,16 +647,22 @@ def analisa_metodos():
 								tokens = tokens[1:]
 								return analisa_metodos()
 							else:
+								salva_erro("}")
 								return False
 						else:
+							salva_erro("{")
 							return False
 					else:
+						salva_erro(":")
 						return False
 				else:
+					salva_erro(")")
 					return False
 			else:
+				salva_erro("(")
 				return False
 		else:
+			salva_erro("IDE")
 			return False
 	return True
 
@@ -607,6 +680,7 @@ def analisa_tipo_retorno():
 		tokens = tokens[1:]
 		return True
 	else:
+		salva_erro("inteiro, real, texto, vazio ou boleano")
 		return False
 
 def analisa_parametro():
@@ -616,6 +690,7 @@ def analisa_parametro():
 		tokens = tokens[1:]
 		return analisa_parametro_aux()
 	else:
+		salva_erro("IDE")
 		return False
 
 def analisa_parametro_aux():
@@ -631,19 +706,23 @@ def analisa_operador_relacional():
 	if(tokens[0][2] == '!=\n' or tokens[0][2] == '==\n' or tokens[0][2] ==  '<\n' or tokens[0][2] == '>\n' or tokens[0][2] ==  '<=\n' or tokens[0][2] ==  '>=\n' or tokens[0][2] ==  '=\n'):
 		tokens = tokens[1:]
 		return True
-	return False
+	else:
+		salva_erro("!=, ==, <, >, <= ou >=")
+		return False
 
 def analisa_op_logico():
 	global tokens
 	if(tokens[0][2] == '&&\n') or (tokens[0][2] == '||\n'):
 		tokens = tokens[1:]
 		return True
+
+	salva_erro("&&, II")
 	return False
 
 def analisa_exp_soma():
 	return analisa_exp_mul() and analisa_exp_art_aux()
 
-def analisa_exp_art_aux():
+def analisa_exp_art_aux(): #################################################
 	global tokens
 	if(tokens[0][2] == '++\n' or tokens[0][2] == '--\n'):
 		tokens = tokens[1:]
