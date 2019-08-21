@@ -40,6 +40,8 @@ def automato_identificador(palavra):
         cont=1
     elif palavra=="entao":
         cont=1
+    elif palavra=="se":
+        cont=1
     elif palavra=="senao":
         cont=1
     elif palavra=="enquanto":
