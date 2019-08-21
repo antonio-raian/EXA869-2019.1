@@ -4,13 +4,25 @@ import os
 file = ""
 tokens = ""
 erros = ""
+output = ''
 
 def main(lista_tokens, arq):
 	global tokens
 	global file
+	global output
+
 	tokens = lista_tokens
 	file = arq
-	analisa_programa()    
+	diretorioSaida = os.path.abspath('.')+"/saida_sintatico/"
+	if(not os.path.isdir(diretorioSaida)):
+		os.mkdir(diretorioSaida)
+	
+	output = open(diretorioSaida +file, 'w')
+	
+	result = analisa_programa()    
+	
+	output.close()
+	return result
 
 def analisa_programa():
 	global tokens
@@ -104,6 +116,8 @@ def analisa_corpo_constantes():		#ACEITA VAZIO. PORTANTO, DEVE PODER RETORNAR AO
 				analisa_prox_declaracao_constantes()
 
 				return True
+			else:
+				salva_erro('=')
 		#SE ALGUMA DAS CONDICOES NAO FOR VERDADEIRA
 
 		tokens = backup
@@ -142,7 +156,7 @@ def analisa_prox_declaracao_constantes():
 			else:
 				salva_erro("=")
 		else:
-			salva_erro("IDE")
+			salva_erro("nome da constante")
 	else:
 		salva_erro("; ou ,")
 
@@ -314,7 +328,7 @@ def analisa_id_ou_num():
 		tokens = tokens[1:]
 		return True
 	else:
-		salva_erro("IDE ou NRO")
+		salva_erro("variavel ou número")
 	return False
 	
 def analisa_comandos_aux():
@@ -429,7 +443,7 @@ def analisa_exp_cadeia():
 		tokens = tokens[1:]
 		return analisa_exp_cadeia_aux()
 	else:
-		salva_erro("CAD")
+		salva_erro("texto")
 		return False
 
 def analisa_exp_cadeia_aux():
@@ -468,11 +482,19 @@ def analisa_atribuiveis(): #####################################################
 	if(tokens[0][2]=='vazio\n' or tokens[0][1]=='NRO'):
 		return True
 	else:
-		return analisa_expressoes() or analisa_boleano()
+		analisa_expressoes()
+		analisa_boleano()
 	return True
 
 def analisa_expressoes():
-	return analisa_exp_soma() or analisa_exp_relacional() or analisa_exp_logica()
+	global tokens
+	if(tokens[0][1] == 'IDE'):
+		if(tokens[1][1] == 'REL' ):
+			return analisa_exp_relacional()
+		else:
+			return analisa_exp_soma() and analisa_exp_logica()
+	elif(tokens[0][1] == 'REL'):
+		analisa_exp_logica()
 
 def analisa_lacos():
 	global tokens
@@ -573,7 +595,7 @@ def analisa_chamada_de_metodo():
 			salva_erro("(")
 			return False
 	else:
-		salva_erro("IDE")
+		salva_erro("nome do metodo")
 		return False
 
 def analisa_parametro_chamada():
@@ -652,7 +674,7 @@ def analisa_metodos():
 				salva_erro("(")
 				return False
 		else:
-			salva_erro("IDE")
+			salva_erro("nome do metodo")
 			return False
 	return True
 
@@ -680,7 +702,7 @@ def analisa_parametro():
 			tokens = tokens[1:]
 			return analisa_parametro_aux()
 		else:
-			salva_erro("IDE")
+			salva_erro("nome do parametro")
 			return False
 	else:
 		salva_erro("tipo do parametro")
@@ -708,8 +730,7 @@ def analisa_op_logico():
 	if(tokens[0][2] == '&&\n') or (tokens[0][2] == '||\n'):
 		tokens = tokens[1:]
 		return True
-
-	salva_erro("&&, II")
+	salva_erro("&&, ||")
 	return False
 
 def analisa_exp_soma():
@@ -820,10 +841,10 @@ def analisa_exp_logica():
 def analisa_exp_logica_recurrency():
 	global tokens
 	backup = tokens
-
-	if(analisa_op_logico()):
-		if(analisa_exp_logica()):
-			return True
+	if(tokens[0][2] not in('entao\n', ')\n', ';\n')):
+		if(analisa_op_logico()):
+			if(analisa_exp_logica()):
+				return True
 
 	tokens = backup
 
@@ -832,26 +853,20 @@ def analisa_exp_logica_recurrency():
 def salva_erro(esperado):
 	global erros
 	global tokens
-	global file
+	global output
 
 	erros = tokens[0]
 
 	print('ERRO '+esperado)
 	print(erros)
 	
-	diretorioSaida = os.path.abspath('.')+"/saida_sintatico/"
-	if(not os.path.isdir(diretorioSaida)):
-		os.mkdir(diretorioSaida)
-	
-	output = open(diretorioSaida +file, 'w')
-
 	linha = erros[0]
 	token = erros[1]
 	valor = erros[2]
 	valor = valor[:-1] #remove o \n
 
 	#LOGICA DE SALVAR O ERRO NO ARQUIVO
-	output.write("Linha do erro: "+linha+". Recebeu \""+valor+", "+token+"\", mas esperava \""+esperado+"\".")
-	output.close()
+	output.write("Linha do erro: "+linha+". Recebeu \""+valor+", "+token+"\", mas esperava \""+esperado+"\".\n")
+	
 
 	# sys.exit("ERRO! (verificar arquivo de erros)") #finaliza o programa
