@@ -1,10 +1,14 @@
+import sys
+
+file = ""
 tokens = ""
 erros = ""
 
-def main(lista_tokens):
+def main(lista_tokens, arq):
     global tokens
+    global arq
     tokens = lista_tokens
-
+    file = arq
     #print(lista_tokens)
     for token in lista_tokens:
         n_linha = token[0]
@@ -12,9 +16,8 @@ def main(lista_tokens):
         value = token[2]
         #print('LINHA '+n_linha+ '->TIPO '+tipo+'->VALOR '+value)
 
-    return analisa_programa()    
-
-
+    analisa_programa()    
+    print(erros)
 
 
 def analisa_programa():
@@ -40,6 +43,13 @@ def analisa_programa():
 				#tokens = tokens[1:]
 				print(tokens[0])
 				return True
+
+			else:
+				salva_erro("}")
+		else:
+			salva_erro("{")
+	else:
+		salva_erro("programa")
 	return False				
 
 
@@ -748,3 +758,28 @@ def analisa_exp_logica_recurrency():
 	tokens = backup
 
 	return True
+
+def salva_erro(esperado):
+	global erros
+
+	erros = tokens[0]
+
+	diretorioSaida = os.getcwd()+"/resultados/"
+	if(os.path.isdir(diretorioSaida)):
+		print("Já tem a pasta de resultados")
+	else:
+		os.mkdir(diretorioSaida)
+	
+	output = open(diretorioSaida + 'Sintatico_'+file, 'w')
+
+
+	linha = erros[0]
+	token = erros[1]
+	valor = erros[2]
+	valor = valor[:-1] #remove o \n
+	#LOGICA DE SALVAR O ERRO NO ARQUIVO
+
+	output.write("Linha do erro: "+linha+". Recebeu <"+valor+", "+token+">, mas esperava "+esperado+".")
+	output.close()
+
+	sys.exit("ERRO! (verificar arquivo de erros)") #finaliza o programa
