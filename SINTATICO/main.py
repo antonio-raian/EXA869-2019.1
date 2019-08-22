@@ -2,7 +2,7 @@
 #CÃ³digo principal do compilador sintático
 # -*- coding: utf-8 -*-
 import os
-from SINTÁTICO import Programa as programa
+from SINTATICO import Programa as programa
 
 #Globais
 tokenAtual = ''

@@ -6,7 +6,7 @@ programa {
         boleano varH = verdadeiro, varI = falso;
     }
 
-    metodo metodo1 (inteiro var1, real var2): inteiro{ 
+    metodo metodo1 (inteiro var1, real var2): { 
         variaveis {
             inteiro exemplo1[4][5], exemplo2;
             texto exemplo3;

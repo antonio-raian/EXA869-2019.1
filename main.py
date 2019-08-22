@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from LEXICO import main as lexico
-from SINTÁTICO import main as sintatico
+from SINTATICO import main as sintatico
 
 lexico.main()
 sintatico.main()
