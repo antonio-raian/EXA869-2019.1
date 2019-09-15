@@ -26,7 +26,6 @@ def main(lista_tokens, arq):
 
     separaConstantes(tokens) #Remove o bloco de constantes dos Lexemas pra analise
     listarMetodos(tokens)
-    verificarListaMetodos(tokens)
     listarVariaveis()
     verificarListaVariaveis()
 
@@ -143,42 +142,11 @@ def listarVariaveis(lista_tokens):
             #x = x + 1
         cont = cont + 1
 
-def verificarListaMetodos(lista_tokens):
-    global listaMetodos
-
-    myTokens = lista_tokens
-    cont = 0
-
-    for token in myTokens:
-        verificarMetodosAux(cont)
-        cont = cont + 1
-
-
-def verificarMetodosAux(indiceAtual):
-    global listaMetodos
-    myTokens = lista_tokens
-
-    metodoAtual = listaMetodos[indiceAtual]
-    cont = 0
-
-    for token in myTokens:
-
-        if(cont > indiceAtual): #conta até passar dele mesmo na lista
-            if(metodoAtual[1] == token[1]): #mesmo nome
-                if(metodoAtual[2] == token[2]): #mesmos parametros
-                    imprimeErroMetodo(metodoAtual[0], token[0], token[2])
-        else:
-            cont = cont + 1
-
 def imprimeErroMetodo(linhaerro1, linhaerro2, nomeMetodo):
     global erros
     global nroErro
 
     erros.append("Erro encontrado na linha "+linhaerro2+". Método "+nomeMetodo+" idêntico ao encontrado na linha "+linhaerro1+".")
-
-
-
-
 
 def listarMetodos(lista_tokens):
     global listaMetodos
@@ -186,54 +154,73 @@ def listarMetodos(lista_tokens):
     parametros = []    
     itemTabela = []
     contParametros = 0
-    myTokens = lista_tokens
+    myTokens = lista_tokens.copy()
     achouMetodo = 0
     cont = 0
     parenteses = 0
     retorno = 0
 
-    for token in myTokens:
+    while len(myTokens) > 0:
+        token = myTokens.pop(0)
         linha = token[0]
         tipo = token[1]
         valor = token[2]
 
-        if(valor == 'metodo\n'):
+        if(tipo == 'PRE' and valor == 'metodo\n'):
             achouMetodo = 1
         elif(achouMetodo == 1): #nome do metodo
             achouMetodo = 2
             itemTabela.append(linha)
-            itemTabela.append(valor[:-1])
+            itemTabela.append(valor[:-1]) #Nome do metodo
 
             # listaMetodos[cont][0] = linha
             # listaMetodos[cont][1] = valor[:-1]
-        elif(achouMetodo == 2 and parenteses == 0): #(
-            parenteses = 1
-        elif(achouMetodo == 2 and parenteses == 1): #parametro
-            parametros.append(token[:-1])
-            contParametros = contParametros + 1
-            parenteses = 2
-        elif(achouMetodo == 2 and parenteses == 2): #) ou ,
-            if (valor == ',\n'):
-                parenteses = 1
-            elif (valor == ')\n'):
-                achouMetodo = 3
-                parenteses = 0
-        elif(achouMetodo == 3 and retorno == 0): #:
-            retorno == 1
-            contParametros = 0
-            itemTabela.append(parametros)
+        elif(achouMetodo == 2 and valor == '(\n'): #(
+            itemParam = []
+            while token[2]!=')\n':
+                token = myTokens.pop(0)
+                linha = token[0]
+                tipo = token[1]
+                valor = token[2]
 
-            # listaMetodos[cont][2] = parametros
-        elif(achouMetodo == 3 and retorno == 1): #tipo do retorno
-            # listaMetodos[cont][3] = valor[:-1]
-            cont = cont + 1
+                if(valor !=')\n'):
+                    if(valor !=',\n'):                    
+                        itemParam.append(valor)
+                    else:
+                        parametros.append(itemParam)
+                        itemParam = []
+                else:
+                    parametros.append(itemParam)
+            retorno = 1
+            itemTabela.append(parametros)
+        elif(retorno == 1 and tipo == 'PRE'):
+            itemTabela.append(valor)
+            if(verificaMetodo(itemTabela)):
+                listaMetodos.append(itemTabela)
+                itemTabela = []
             retorno = 0
             achouMetodo = 0
 
-            itemTabela.append(valor[:-1])
-            listaMetodos.append(itemTabela)
-            itemTabela = []
+def verificaMetodo(item):
+    global listaMetodos
 
+    for metodo in listaMetodos:
+        iguais = 0
+        if(item[1] == metodo[1]): #nome igual
+            paramsItem = item[2]
+            paramsMetodo = metodo[2]
+            if(len(paramsItem) == len(paramsMetodo)):# Se a quantidade de parametros for a mesma Há a possibilidade de serem iguais
+                i = 0
+                for param in paramsMetodo: #Percorre os parametros
+                    if(param[0] == paramsItem[i][0]): #Vai contando a quantidade de parametros iguais
+                        iguais = iguais + 1
+                    else: #Se algum for diferente para
+                        break
+                    i += 1
+                if(iguais == len(paramsItem)): #Se todos os param forem iguais tá errado
+                    imprimeErroMetodo(metodo[0], item[0], item[1] )
+                    return False
+    return True
 
 def separaConstantes(lista_tokens):
     global tokens
