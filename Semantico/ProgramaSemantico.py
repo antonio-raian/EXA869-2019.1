@@ -25,7 +25,7 @@ def main(lista_tokens, arq):
     output = open(diretorioSaida +file, 'w')
 
     separaConstantes(tokens) #Remove o bloco de constantes dos Lexemas pra analise
-    listarMetodos(tokens)
+    listarMetodos(tokens) #Coloca os metodos numa lista e verifica a igualdade entre os mesmos
     listarVariaveis()
     verificarListaVariaveis()
 
@@ -74,7 +74,6 @@ def imprimeErroVariavel(linhaerro1, linhaerro2, nomeVariavel):
     global nroErro
 
     erros.append("Erro encontrado na linha "+linhaerro2+". Nome de variável "+nomeVariavel+" idêntico, no mesmo escopo, ao encontrado na linha "+linhaerro1+".")
-
 
 def listarVariaveis(lista_tokens):
     global tabelaMetodos
@@ -142,22 +141,26 @@ def listarVariaveis(lista_tokens):
             #x = x + 1
         cont = cont + 1
 
+
 def imprimeErroMetodo(linhaerro1, linhaerro2, nomeMetodo):
     global erros
     global nroErro
 
     erros.append("Erro encontrado na linha "+linhaerro2+". Método "+nomeMetodo+" idêntico ao encontrado na linha "+linhaerro1+".")
 
+
+def erroRetornoMetodo(linha, metodo):
+    global erros
+    erros.append("Erro encontrado na linha "+linha+". Método "+metodo[1]+" esperado resultado"+metodo[3]+" .")
+
 def listarMetodos(lista_tokens):
     global listaMetodos
 
     parametros = []    
     itemTabela = []
-    contParametros = 0
+    metodoAtual = []
     myTokens = lista_tokens.copy()
     achouMetodo = 0
-    cont = 0
-    parenteses = 0
     retorno = 0
 
     while len(myTokens) > 0:
@@ -166,8 +169,36 @@ def listarMetodos(lista_tokens):
         tipo = token[1]
         valor = token[2]
 
-        if(tipo == 'PRE' and valor == 'metodo\n'):
-            achouMetodo = 1
+        if(tipo == 'PRE'):
+            if(valor == 'metodo\n'):
+                achouMetodo = 1
+            elif(retorno == 1):
+                itemTabela.append(valor)
+                if(verificaMetodo(itemTabela)):
+                    listaMetodos.append(itemTabela)
+                    metodoAtual = itemTabela.copy()
+                    itemTabela = []
+                retorno = 0
+                achouMetodo = 0
+            elif(valor == 'resultado\n'):
+                token = myTokens.pop(0)
+                linha = token[0]
+                tipo = token[1]
+                valor = token[2]
+                if(tipo == 'PRE'):
+                    if(valor == 'vazio\n' and metodoAtual[3] != 'vazio\n'):
+                        erroRetornoMetodo(linha, metodoAtual)
+                elif(tipo == 'IDE'):
+                    var = pegaVariavel(valor, metodoAtual)
+                    const = verificaConstante(token)
+                    if(var):
+                        if(metodoAtual[3] != var[2]):
+                            erroRetornoMetodo(linha, metodoAtual)
+                    elif(const):
+                        if(metodoAtual[3] != const[2]):
+                            erroRetornoMetodo(linha, metodoAtual)
+                else:
+                    erroRetornoMetodo(linha, metodoAtual)
         elif(achouMetodo == 1): #nome do metodo
             achouMetodo = 2
             itemTabela.append(linha)
@@ -193,13 +224,8 @@ def listarMetodos(lista_tokens):
                     parametros.append(itemParam)
             retorno = 1
             itemTabela.append(parametros)
-        elif(retorno == 1 and tipo == 'PRE'):
-            itemTabela.append(valor)
-            if(verificaMetodo(itemTabela)):
-                listaMetodos.append(itemTabela)
-                itemTabela = []
-            retorno = 0
-            achouMetodo = 0
+            
+        
 
 def verificaMetodo(item):
     global listaMetodos
@@ -248,7 +274,6 @@ def separaConstantes(lista_tokens):
 
     mapeiaConstantes(myTokens)
 
-
 def mapeiaConstantes(lista_tokens):
     global tabelaConstantes
 
@@ -262,14 +287,17 @@ def mapeiaConstantes(lista_tokens):
         tipo = token[1]
         valor = token[2]
 
-        if(tipo == 'PRE' and valor != 'constantes\n'): #Achou nova tipagem de constante
+        if(tipo == 'PRE' and valor != 'constantes\n' and valor != 'falso\n' and valor != 'verdadeiro\n'): #Achou nova tipagem de constante
             tipagemAtual = valor
         elif(tipo == 'IDE'): #Achou novo nome de constante
             itemTabela.append(linha)
             itemTabela.append(tipagemAtual) #Referente à tipagem da constante. Não confundir com 'tipo', que é o tipo do TOKEN, não da variável
             itemTabela.append(valor)
 
-            tabelaConstantes.append(itemTabela)
+            if(verificaConstante(itemTabela) == True):
+                tabelaConstantes.append(itemTabela)
+            else:
+                imprimeErroConstante(linha, ultimaConstante, tipagemAtual)
             
             #Não é necessário salvar o contexto, pois essa tabela é própria para constantes
             ultimaConstante = valor
@@ -290,8 +318,29 @@ def mapeiaConstantes(lista_tokens):
                 if not(tipo == 'NRO' and "." in valor): #atribuicao errada OU é um inteiro
                     imprimeErroConstante(str(linha), ultimaConstante[:-1], tipagemAtual[-1])
 
+def verificaConstante(item):
+    global tabelaConstantes
+
+    for constante in tabelaConstantes:
+        if(constante[2] == item[2]):
+            return constante
+    return True
+
 def imprimeErroConstante(linhaerro, ultimaConstante, tipagemErro):
     global erros
     global nroErro
 
     erros.append("Erro encontrado na linha "+linhaerro+". Atribuição inadequada para constante <"+ultimaConstante+">, que possui o tipo "+tipagemErro+".")
+
+
+def pegaVariavel(nome, escopo):
+    global listaTabelaVariaveis
+    global listaMetodos
+
+    indice = listaMetodos.index(escopo)
+    variaveisMetodo = listaTabelaVariaveis[indice]
+
+    for variavel in variaveisMetodo:
+        if(variavel[2] == nome):
+            return variavel
+    return False
