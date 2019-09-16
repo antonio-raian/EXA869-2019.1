@@ -1,6 +1,9 @@
 __pycache__
 
+.vscode
+
 LEXICO/resultados/
 SINTATICO/resultados/
 saida_lexico/
 saida_sintatico/
+saida_semantico/
