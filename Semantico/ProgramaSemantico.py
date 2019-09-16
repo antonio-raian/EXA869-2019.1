@@ -29,9 +29,141 @@ def main(lista_tokens, arq):
     verificarListaMetodos(tokens)
     listarVariaveis()
     verificarListaVariaveis()
+    verificaExistenciaVariavel(tokens)
+    verificaAtribuicaoVariavel(tokens)
 
     print(erros)
 
+
+def verificaExistenciaVariavel(lista_tokens):
+    global tabelaMetodos
+    global listaTabelaVariaveis
+    global indicePrincipal
+
+    myTokens = lista_tokens
+    indiceMetodoAtual = -1
+    varcontrole = 0
+    cont = 0
+    varExiste = 0
+    ideAtual = ""
+
+
+    for token in lista_tokens:
+        linha = token[0]
+        tipo = token[1]
+        valor = token[2]
+
+        if(valor == 'metodo\n'):
+            indiceMetodoAtual = indiceMetodoAtual + 1 #pega a referencia do metodo atual
+
+        if(tipo == 'IDE'): #achou um IDE
+            
+            for metodo in listaTabelaVariaveis:
+                if (cont == indiceMetodoAtual or cont == indicePrincipal):
+                    for variavel in metodo:
+                        if (variavel[2] == ideAtual): #se o nome da variavel for o mesmo nome...
+                            varExiste = 1
+                    cont = cont + 1
+                    if(varExiste == 1):
+                        varExiste == 0
+                    else:
+                        imprimeErroExistenciaVariavel(listaMetodos[indiceMetodoAtual][1], valor[:-1])
+
+def imprimeErroExistenciaVariavel(nomeMetodo, nomeVariavel):
+    global erros
+    global nroErro
+
+    erros.append("Variavel/constante de nome "+nomeVariavel+" usada no metodo "+nomeMetodo+" nao foi inicializada.")
+
+def imprimeErroAtribuicaoConstante(linha, nomeVariavel):
+    global erros
+    global nroErro
+
+    erros.append("Constante de nome "+nomeVariavel+" recebendo atribuicao na linha "+linha)
+
+def imprimeErroAtribuicaoVariavel(linha, nomeVariavel):
+    global erros
+    global nroErro
+
+    erros.append("Atribucao na linha "+linha+" de um tipo incorreto da variavel "+nomeVariavel)
+
+
+
+def verificaAtribuicaoVariavel(lista_tokens):
+    global tabelaMetodos
+    global listaTabelaVariaveis
+    global indicePrincipal
+
+    myTokens = lista_tokens
+    indiceMetodoAtual = -1
+    varcontrole = 0
+    cont = 0
+    varExiste = 0
+    ideAtual = ""
+    tipoAtual = ""
+    tipoComparar = ""
+
+
+    for token in lista_tokens:
+        linha = token[0]
+        tipo = token[1]
+        valor = token[2]
+
+        if(valor == 'metodo\n'):
+            indiceMetodoAtual = indiceMetodoAtual + 1 #pega a referencia do metodo atual
+
+        if(tipo == 'IDE' and varcontrole == 0): #achou um IDE
+            varcontrole = 1
+            ideAtual = valor[:-1]
+            for metodo in listaTabelaVariaveis:
+                if (cont == indiceMetodoAtual):
+                    for variavel in metodo:
+                        if (variavel[2] == valor[-1]): #se o nome da variavel for o mesmo nome...
+                            tipoAtual = variavel[1]
+                elif(cont == indicePrincipal):
+                    for variavel in metodo:
+                        if (variavel[2] == valor[-1]): #se o nome da variavel for o mesmo nome...
+                            imprimeErroAtribuicaoConstante(variavel[0], variavel[2])
+            cont = 0
+        elif(valor == '=\n' and varcontrole == 1): #todo IDE sucedido de = sem outro = na frente é atribuição
+            varcontrole = 2
+        elif(valor == '(\n' and varcontrole == 2): #pode achar ( ou IDE ou NRO... ou PRE
+            #not treated...
+
+            cont = 0
+            varcontrole = 0
+        elif(tipo == 'NRO' and varcontrole == 2):
+            if(tipoAtual != 'real' and tipoAtual != 'inteiro'):
+                imprimeErroAtribuicaoVariavel(variavel[0], ideAtual)
+            elif(tipoAtual == 'real' and '.' not in valor):
+                imprimeErroAtribuicaoVariavel(variavel[0], ideAtual)
+            elif(tipoAtual == 'inteiro' and '.' in valor):
+                imprimeErroAtribuicaoVariavel(variavel[0], ideAtual)
+
+            cont = 0
+            varcontrole = 0
+
+        elif(valor == 'IDE' and varcontrole == 2):
+            for metodo in listaTabelaVariaveis:
+                if (cont == indiceMetodoAtual or cont == indicePrincipal):
+                    for variavel in metodo:
+                        if (variavel[2] == valor[-1]): #se o nome da variavel for o mesmo nome...
+                            tipoComparar = variavel[1]
+
+                            if (tipoComparar != tipoAtual): #se o tipo da variavel enontrada for diferente do tipo da variavel sendo atribuida
+                                imprimeErroAtribuicaoVariavel(variavel[0], ideAtual)
+                    cont = cont + 1
+
+            cont = 0
+            varcontrole = 0
+        elif(valor == 'PRE' and varcontrole == 2):
+            if(valor[:-1] != 'verdadeiro' and valor[:-1] != 'falso'):
+                imprimeErroAtribuicaoVariavel(variavel[0], ideAtual)
+            elif(tipoAtual != 'boleano'):
+                imprimeErroAtribuicaoVariavel(variavel[0], ideAtual)
+   
+            cont = 0
+            varcontrole = 0
 
 def verificarListaVariaveis(lista_tokens):
     global tabelaMetodos
