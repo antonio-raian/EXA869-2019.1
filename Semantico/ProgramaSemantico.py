@@ -6,7 +6,7 @@ tokens = ""
 tabelaConstantes = []
 listaMetodos = []  #0 - linha, 1 - nome, 2 - parametros(array), 3 - retorno
 listaTabelaVariaveis = [] #uma lista de tabelas. Cada elemento da lista é uma tabela de um método, cujo indice é o mesmo da listaMetodos
-                          #[indice do metodo][indice da variavel][0] - linha da variavel, [indice do metodo][indice da variavel][1] - tipo e [indice do metodo][indice da variavel][2] - nome.
+                          #[indice do metodo][indice da variavel][0] listaTabela- linha da variavel, [indice do metodo][indice da variavel][1] - tipo e [indice do metodo][indice da variavel][2] - nome.
 erros = [] #lista de erros semanticos para serem impressos no final da execucao
 nroErro = 0
 indicePrincipal = -1 #variável que diz qual é o índice do MAIN na variável listaTabelaVariaveis
@@ -26,13 +26,16 @@ def main(lista_tokens, arq):
 
     separaConstantes(tokens) #Remove o bloco de constantes dos Lexemas pra analise
     listarMetodos(tokens) #Coloca os metodos numa lista e verifica a igualdade entre os mesmos
-    listarVariaveis()
-    verificarListaVariaveis()
+    listarVariaveis(tokens)
+    verificarListaVariaveis(tokens)
     verificaExistenciaVariavel(tokens)
     verificaAtribuicaoVariavel(tokens)
 
     print(erros)
 
+    for erro in erros:
+        output.write(erro)
+    output.close
 
 def verificaExistenciaVariavel(lista_tokens):
     global tabelaMetodos
@@ -60,7 +63,9 @@ def verificaExistenciaVariavel(lista_tokens):
             for metodo in listaTabelaVariaveis:
                 if (cont == indiceMetodoAtual or cont == indicePrincipal):
                     for variavel in metodo:
-                        if (variavel[2] == ideAtual): #se o nome da variavel for o mesmo nome...
+                        print(metodo)
+                        print(variavel)
+                        if (variavel[0][2] == ideAtual): #se o nome da variavel for o mesmo nome...
                             varExiste = 1
                     cont = cont + 1
                     if(varExiste == 1):
@@ -84,7 +89,10 @@ def imprimeErroAtribuicaoVariavel(linha, nomeVariavel):
     global erros
     global nroErro
 
-    erros.append("Atribucao na linha "+linha+" de um tipo incorreto da variavel "+nomeVariavel)
+
+    print(nomeVariavel)
+    print(linha)
+    erros.append("Atribucao na linha "+linha[0]+" de um tipo incorreto da variavel "+nomeVariavel)
 
 
 def verificaAtribuicaoVariavel(lista_tokens):
@@ -116,7 +124,7 @@ def verificaAtribuicaoVariavel(lista_tokens):
             for metodo in listaTabelaVariaveis:
                 if (cont == indiceMetodoAtual):
                     for variavel in metodo:
-                        if (variavel[2] == valor[-1]): #se o nome da variavel for o mesmo nome...
+                        if (variavel[0][2] == valor[-1]): #se o nome da variavel for o mesmo nome...
                             tipoAtual = variavel[1]
                 elif(cont == indicePrincipal):
                     for variavel in metodo:
@@ -212,13 +220,17 @@ def listarVariaveis(lista_tokens):
     global indicePrincipal
 
     myTokens = lista_tokens
-    elementos = ""
+    elementos = []
     cont = 0
     x = 0
     achouMetodo = 0
     achouTipo = 0
     tipoAtual = ""
     numVariaveis = 0
+    auxnum = []
+    auxnum3 = []
+
+
 
     for token in myTokens:
         linha = token[0]
@@ -226,7 +238,7 @@ def listarVariaveis(lista_tokens):
         valor = token[2]
 
         if(valor == 'metodo\n'):
-            elementos[x] = cont
+            elementos.append(cont)
             x = x + 1
 
         cont = cont + 1
@@ -251,6 +263,7 @@ def listarVariaveis(lista_tokens):
         elif(achouMetodo == 3 and achouTipo == 0): #tipo novo ou }
             if (valor == '}\n'):
                 x = x + 1 #proximo metodo a ser analisado
+
                 tipoAtual = ""
                 achouMetodo = 0
                 numVariaveis = 0
@@ -258,15 +271,24 @@ def listarVariaveis(lista_tokens):
                 tipoAtual = valor[:-1]
                 achouTipo = 1
         elif(achouMetodo == 3 and achouTipo == 1): #nome da variavel
-            tabelaMetodos[x][numVariaveis][0] = linha
-            tabelaMetodos[x][numVariaveis][1] = tipoAtual
-            tabelaMetodos[x][numVariaveis][2] = valor[:-1]
+            auxnum2 = []
+            auxnum2.append(linha)
+            auxnum2.append(tipoAtual)
+            auxnum2.append(valor[:-1])
+            auxnum.append(auxnum2)
+        
+            auxnum3.append(auxnum)
+            #listaTabelaVariaveis[x].append(auxnum)
+            auxnum = []
             achouTipo = 2
             numVariaveis = numVariaveis + 1
         elif(achouMetodo == 3 and achouTipo == 2): #, ou ;
             if (valor == ',\n'):
                 achouTipo == 1
             else:
+                listaTabelaVariaveis.append(auxnum3)
+                
+                auxnum3 = []
                 achouTipo == 0
 
             #x = x + 1
@@ -281,7 +303,7 @@ def imprimeErroMetodo(linhaerro1, linhaerro2, nomeMetodo):
 
 def erroRetornoMetodo(linha, metodo):
     global erros
-    erros.append("Erro encontrado na linha "+linha+". Método "+metodo[1]+" esperado resultado"+metodo[3]+" .")
+    erros.append("Erro encontrado na linha "+linha+". Método "+metodo[1]+" esperado resultado "+metodo[3]+" .")
 
 def listarMetodos(lista_tokens):
     global listaMetodos
@@ -318,17 +340,17 @@ def listarMetodos(lista_tokens):
                 if(tipo == 'PRE'):
                     if(valor == 'vazio\n' and metodoAtual[3] != 'vazio\n'):
                         erroRetornoMetodo(linha, metodoAtual)
-                elif(tipo == 'IDE'):
-                    var = pegaVariavel(valor, metodoAtual)
-                    const = verificaConstante(token)
-                    if(var):
-                        if(metodoAtual[3] != var[2]):
-                            erroRetornoMetodo(linha, metodoAtual)
-                    elif(const):
-                        if(metodoAtual[3] != const[2]):
-                            erroRetornoMetodo(linha, metodoAtual)
-                else:
-                    erroRetornoMetodo(linha, metodoAtual)
+                #elif(tipo == 'IDE'):
+                    #var = pegaVariavel(valor, metodoAtual)
+                    #const = verificaConstante(token)
+                    #if(var):
+                        #if(metodoAtual[3] != var[2]):
+                            #erroRetornoMetodo(linha, metodoAtual)
+                    #elif(const):
+                        #if(metodoAtual[3] != const[2]):
+                            #erroRetornoMetodo(linha, metodoAtual)
+                #else:
+                    #erroRetornoMetodo(linha, metodoAtual)
         elif(achouMetodo == 1): #nome do metodo
             achouMetodo = 2
             itemTabela.append(linha)
@@ -466,6 +488,7 @@ def pegaVariavel(nome, escopo):
     global listaMetodos
 
     indice = listaMetodos.index(escopo)
+    print(listaTabelaVariaveis)
     variaveisMetodo = listaTabelaVariaveis[indice]
 
     for variavel in variaveisMetodo:
