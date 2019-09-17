@@ -133,11 +133,8 @@ def verificaAtribuicaoVariavel(lista_tokens):
             cont = 0
         elif(valor == '=\n' and varcontrole == 1): #todo IDE sucedido de = sem outro = na frente é atribuição
             varcontrole = 2
-        elif(valor == '(\n' and varcontrole == 2): #pode achar ( ou IDE ou NRO... ou PRE
-            #not treated...
-
-            cont = 0
-            varcontrole = 0
+        elif((valor == '(\n' or valor == ')\n') and varcontrole == 2): #pode achar ( ou IDE ou NRO... ou PRE
+            cont = cont
         elif(tipo == 'NRO' and varcontrole == 2):
             if(tipoAtual != 'real' and tipoAtual != 'inteiro'):
                 imprimeErroAtribuicaoVariavel(variavel[0], ideAtual)
