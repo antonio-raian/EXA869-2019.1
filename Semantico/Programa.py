@@ -307,10 +307,26 @@ def validaAtribuicao(destino, expressao, variaveis): #Expressao será um array d
         if(len(tipo_expressao)>1):
             erros.append("Erro encontrado na linha "+expressao[0][0]+". Atribuindo uma expressão lógica incorretamente!")
         elif(tipo_expressao[0]=='var'):
-            varOuConstTipo(variaveis, expressao[0], tipo_destino)
+            varOuConstTipo(variaveis, expressao[0], [tipo_destino])
         elif(tipo_expressao[0]=='num'):
             if(tipo_destino == 'inteiro\n' and '.' in expressao[0][2]):
                 erros.append("Erro encontrado na linha "+expressao[0][0]+". Esperava atribuição do tipo "+tipo_destino+', recebeu do tipo real')
+        elif(tipo_expressao[0 == 'ari']):
+            while len(expressao)>0:
+                token = expressao.pop(0)
+                [linha, tipo, valor] = token
+                if(tipo == 'IDE'):
+                    if(tipo_destino == 'inteiro\n'):
+                        varOuConstTipo(variaveis, token, [tipo_destino])
+                    else:
+                        var = varOuConstTipo(variaveis, token, ['inteiro\n', 'real\n'])
+                        tipo_var = var[1] if var else var
+                        if(tipo_var and (tipo_var != 'inteiro\n' or tipo_var != 'real\n')):
+                            erros.append("Erro encontrado na linha "+token[0]+". Esperava atribuição do tipo real ou inteiro, recebeu do tipo "+tipo_var)
+                elif(tipo == 'NRO'):
+                    if(tipo_destino == 'inteiro\n' and '.' in expressao[0][2]):
+                        erros.append("Erro encontrado na linha "+token[0]+". Esperava atribuição do tipo "+tipo_destino+', recebeu do tipo real')
+
     elif(tipo_destino == 'texto\n'):
         pass #A gramatica não permite atribuir texto só em constantes
     elif(tipo_destino == 'boleano\n'):
@@ -324,8 +340,8 @@ def tipoExpressao(tokens):
         [linha, tipo, valor] = token
         if(tipo == 'IDE' and tipo_expressao[pos] == 'nada'):
             tipo_expressao[pos] = 'var'
-        elif(tipo == 'ART'):
-            tipo_expressao[pos] = 'art'
+        elif(tipo == 'ARI'):
+            tipo_expressao[pos] = 'ari'
         elif(tipo == 'LOG'):
             tipo_expressao[pos] = 'log'
             pos = pos + 1
@@ -340,14 +356,17 @@ def tipoExpressao(tokens):
 def varOuConstTipo(variaveis, token, tipo_destino):
     global tabelaConstantes
 
-    var = getItem(variaveis, token[0])
+    var = getItem(variaveis, token)
     if(var):
-        if(var[1] != tipo_destino):
-            erros.append("Erro encontrado na linha "+token[0][0]+". Esperava atribuição do tipo "+tipo_destino+', recebeu do tipo '+var[1])
+        if(var[1] not in tipo_destino):
+            erros.append("Erro encontrado na linha "+token[0]+". Esperava atribuição do tipo ".join(tipo_destino)+', recebeu do tipo '+var[1])
+        return var
     else:
-        const = getItem(tabelaConstantes, token[0])
+        const = getItem(tabelaConstantes, token)
         if(const):
-            if(var[1] != tipo_destino):
-                erros.append("Erro encontrado na linha "+token[0][0]+". Esperava atribuição do tipo "+tipo_destino+', recebeu do tipo '+var[1])
+            if(var[1] not in tipo_destino):
+                erros.append("Erro encontrado na linha "+token[0]+". Esperava atribuição do tipo ".join(tipo_destino)+', recebeu do tipo '+var[1])
+            return const
         else:
-            erros.append("Erro encontrado na linha "+token[0][0]+". "+expressão[0][2]+' Não foi declarado!')
+            erros.append("Erro encontrado na linha "+token[0]+". "+token[2]+' Não foi declarado!')
+    return False

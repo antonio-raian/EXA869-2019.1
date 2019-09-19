@@ -10,7 +10,7 @@ programa {
         variaveis {
             inteiro exemplo1[4][5], exemplo2;
             texto exemplo3;
-            real exemplo4[6];
+            real exemplo4[6], exemplo5;
         }
 
         leia (leitura1,leitura2);
@@ -18,6 +18,9 @@ programa {
 
         atrib1 = rel1 < 9;
         exemplo2 = 2;
+        exemplo2 = exemplo5;
+        exemplo5 = 2 + 3;
+        exemplo5 = a + 3;
 
         enquanto !(verdadeiro && verdadeiro2) || (eqt1 && eqt2) entao{
             variaveis{}
