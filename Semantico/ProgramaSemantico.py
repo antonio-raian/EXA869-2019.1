@@ -6,7 +6,7 @@ tokens = ""
 tabelaConstantes = []
 listaMetodos = []  #0 - linha, 1 - nome, 2 - parametros(array), 3 - retorno
 listaTabelaVariaveis = [] #uma lista de tabelas. Cada elemento da lista é uma tabela de um método, cujo indice é o mesmo da listaMetodos
-                          #[indice do metodo][indice da variavel][0] - linha da variavel, [indice do metodo][indice da variavel][1] - tipo e [indice do metodo][indice da variavel][2] - nome.
+                          #[indice do metodo][indice da variavel][0] listaTabela- linha da variavel, [indice do metodo][indice da variavel][1] - tipo e [indice do metodo][indice da variavel][2] - nome.
 erros = [] #lista de erros semanticos para serem impressos no final da execucao
 nroErro = 0
 indicePrincipal = -1 #variável que diz qual é o índice do MAIN na variável listaTabelaVariaveis
@@ -25,13 +25,148 @@ def main(lista_tokens, arq):
     output = open(diretorioSaida +file, 'w')
 
     separaConstantes(tokens) #Remove o bloco de constantes dos Lexemas pra analise
-    listarMetodos(tokens)
-    verificarListaMetodos(tokens)
-    listarVariaveis()
-    verificarListaVariaveis()
+    listarMetodos(tokens) #Coloca os metodos numa lista e verifica a igualdade entre os mesmos
+    listarVariaveis(tokens)
+    verificarListaVariaveis(tokens)
+    verificaExistenciaVariavel(tokens)
+    verificaAtribuicaoVariavel(tokens)
 
     print(erros)
 
+    for erro in erros:
+        output.write(erro)
+    output.close
+
+def verificaExistenciaVariavel(lista_tokens):
+    global tabelaMetodos
+    global listaTabelaVariaveis
+    global indicePrincipal
+
+    myTokens = lista_tokens
+    indiceMetodoAtual = -1
+    varcontrole = 0
+    cont = 0
+    varExiste = 0
+    ideAtual = ""
+
+
+    for token in lista_tokens:
+        linha = token[0]
+        tipo = token[1]
+        valor = token[2]
+
+        if(valor == 'metodo\n'):
+            indiceMetodoAtual = indiceMetodoAtual + 1 #pega a referencia do metodo atual
+
+        if(tipo == 'IDE'): #achou um IDE
+            
+            for metodo in listaTabelaVariaveis:
+                if (cont == indiceMetodoAtual or cont == indicePrincipal):
+                    for variavel in metodo:
+                        print(metodo)
+                        print(variavel)
+                        if (variavel[0][2] == ideAtual): #se o nome da variavel for o mesmo nome...
+                            varExiste = 1
+                    cont = cont + 1
+                    if(varExiste == 1):
+                        varExiste == 0
+                    else:
+                        imprimeErroExistenciaVariavel(listaMetodos[indiceMetodoAtual][1], valor[:-1])
+
+def imprimeErroExistenciaVariavel(nomeMetodo, nomeVariavel):
+    global erros
+    global nroErro
+
+    erros.append("Variavel/constante de nome "+nomeVariavel+" usada no metodo "+nomeMetodo+" nao foi inicializada.")
+
+def imprimeErroAtribuicaoConstante(linha, nomeVariavel):
+    global erros
+    global nroErro
+
+    erros.append("Constante de nome "+nomeVariavel+" recebendo atribuicao na linha "+linha)
+
+def imprimeErroAtribuicaoVariavel(linha, nomeVariavel):
+    global erros
+    global nroErro
+
+
+    print(nomeVariavel)
+    print(linha)
+    erros.append("Atribucao na linha "+linha[0]+" de um tipo incorreto da variavel "+nomeVariavel)
+
+
+def verificaAtribuicaoVariavel(lista_tokens):
+    global tabelaMetodos
+    global listaTabelaVariaveis
+    global indicePrincipal
+
+    myTokens = lista_tokens
+    indiceMetodoAtual = -1
+    varcontrole = 0
+    cont = 0
+    varExiste = 0
+    ideAtual = ""
+    tipoAtual = ""
+    tipoComparar = ""
+
+
+    for token in lista_tokens:
+        linha = token[0]
+        tipo = token[1]
+        valor = token[2]
+
+        if(valor == 'metodo\n'):
+            indiceMetodoAtual = indiceMetodoAtual + 1 #pega a referencia do metodo atual
+
+        if(tipo == 'IDE' and varcontrole == 0): #achou um IDE
+            varcontrole = 1
+            ideAtual = valor[:-1]
+            for metodo in listaTabelaVariaveis:
+                if (cont == indiceMetodoAtual):
+                    for variavel in metodo:
+                        if (variavel[0][2] == valor[-1]): #se o nome da variavel for o mesmo nome...
+                            tipoAtual = variavel[1]
+                elif(cont == indicePrincipal):
+                    for variavel in metodo:
+                        if (variavel[2] == valor[-1]): #se o nome da variavel for o mesmo nome...
+                            imprimeErroAtribuicaoConstante(variavel[0], variavel[2])
+            cont = 0
+        elif(valor == '=\n' and varcontrole == 1): #todo IDE sucedido de = sem outro = na frente é atribuição
+            varcontrole = 2
+        elif((valor == '(\n' or valor == ')\n') and varcontrole == 2): #pode achar ( ou IDE ou NRO... ou PRE
+            cont = cont
+        elif(tipo == 'NRO' and varcontrole == 2):
+            if(tipoAtual != 'real' and tipoAtual != 'inteiro'):
+                imprimeErroAtribuicaoVariavel(variavel[0], ideAtual)
+            elif(tipoAtual == 'real' and '.' not in valor):
+                imprimeErroAtribuicaoVariavel(variavel[0], ideAtual)
+            elif(tipoAtual == 'inteiro' and '.' in valor):
+                imprimeErroAtribuicaoVariavel(variavel[0], ideAtual)
+
+            cont = 0
+            varcontrole = 0
+
+        elif(valor == 'IDE' and varcontrole == 2):
+            for metodo in listaTabelaVariaveis:
+                if (cont == indiceMetodoAtual or cont == indicePrincipal):
+                    for variavel in metodo:
+                        if (variavel[2] == valor[-1]): #se o nome da variavel for o mesmo nome...
+                            tipoComparar = variavel[1]
+
+                            if (tipoComparar != tipoAtual): #se o tipo da variavel enontrada for diferente do tipo da variavel sendo atribuida
+                                imprimeErroAtribuicaoVariavel(variavel[0], ideAtual)
+                    cont = cont + 1
+
+            cont = 0
+            varcontrole = 0
+        elif(valor == 'PRE' and varcontrole == 2):
+            if(valor[:-1] != 'verdadeiro' and valor[:-1] != 'falso'):
+                imprimeErroAtribuicaoVariavel(variavel[0], ideAtual)
+            elif(tipoAtual != 'boleano'):
+                imprimeErroAtribuicaoVariavel(variavel[0], ideAtual)
+   
+            cont = 0
+            varcontrole = 0
 
 def verificarListaVariaveis(lista_tokens):
     global tabelaMetodos
@@ -76,20 +211,23 @@ def imprimeErroVariavel(linhaerro1, linhaerro2, nomeVariavel):
 
     erros.append("Erro encontrado na linha "+linhaerro2+". Nome de variável "+nomeVariavel+" idêntico, no mesmo escopo, ao encontrado na linha "+linhaerro1+".")
 
-
 def listarVariaveis(lista_tokens):
     global tabelaMetodos
     global listaTabelaVariaveis
     global indicePrincipal
 
     myTokens = lista_tokens
-    elementos = ""
+    elementos = []
     cont = 0
     x = 0
     achouMetodo = 0
     achouTipo = 0
     tipoAtual = ""
     numVariaveis = 0
+    auxnum = []
+    auxnum3 = []
+
+
 
     for token in myTokens:
         linha = token[0]
@@ -97,7 +235,7 @@ def listarVariaveis(lista_tokens):
         valor = token[2]
 
         if(valor == 'metodo\n'):
-            elementos[x] = cont
+            elementos.append(cont)
             x = x + 1
 
         cont = cont + 1
@@ -122,6 +260,7 @@ def listarVariaveis(lista_tokens):
         elif(achouMetodo == 3 and achouTipo == 0): #tipo novo ou }
             if (valor == '}\n'):
                 x = x + 1 #proximo metodo a ser analisado
+
                 tipoAtual = ""
                 achouMetodo = 0
                 numVariaveis = 0
@@ -129,46 +268,29 @@ def listarVariaveis(lista_tokens):
                 tipoAtual = valor[:-1]
                 achouTipo = 1
         elif(achouMetodo == 3 and achouTipo == 1): #nome da variavel
-            tabelaMetodos[x][numVariaveis][0] = linha
-            tabelaMetodos[x][numVariaveis][1] = tipoAtual
-            tabelaMetodos[x][numVariaveis][2] = valor[:-1]
+            auxnum2 = []
+            auxnum2.append(linha)
+            auxnum2.append(tipoAtual)
+            auxnum2.append(valor[:-1])
+            auxnum.append(auxnum2)
+        
+            auxnum3.append(auxnum)
+            #listaTabelaVariaveis[x].append(auxnum)
+            auxnum = []
             achouTipo = 2
             numVariaveis = numVariaveis + 1
         elif(achouMetodo == 3 and achouTipo == 2): #, ou ;
             if (valor == ',\n'):
                 achouTipo == 1
             else:
+                listaTabelaVariaveis.append(auxnum3)
+                
+                auxnum3 = []
                 achouTipo == 0
 
             #x = x + 1
         cont = cont + 1
 
-def verificarListaMetodos(lista_tokens):
-    global listaMetodos
-
-    myTokens = lista_tokens
-    cont = 0
-
-    for token in myTokens:
-        verificarMetodosAux(cont)
-        cont = cont + 1
-
-
-def verificarMetodosAux(indiceAtual):
-    global listaMetodos
-    myTokens = lista_tokens
-
-    metodoAtual = listaMetodos[indiceAtual]
-    cont = 0
-
-    for token in myTokens:
-
-        if(cont > indiceAtual): #conta até passar dele mesmo na lista
-            if(metodoAtual[1] == token[1]): #mesmo nome
-                if(metodoAtual[2] == token[2]): #mesmos parametros
-                    imprimeErroMetodo(metodoAtual[0], token[0], token[2])
-        else:
-            cont = cont + 1
 
 def imprimeErroMetodo(linhaerro1, linhaerro2, nomeMetodo):
     global erros
@@ -176,63 +298,102 @@ def imprimeErroMetodo(linhaerro1, linhaerro2, nomeMetodo):
 
     erros.append("Erro encontrado na linha "+linhaerro2+". Método "+nomeMetodo+" idêntico ao encontrado na linha "+linhaerro1+".")
 
-
-
-
+def erroRetornoMetodo(linha, metodo):
+    global erros
+    erros.append("Erro encontrado na linha "+linha+". Método "+metodo[1]+" esperado resultado "+metodo[3]+" .")
 
 def listarMetodos(lista_tokens):
     global listaMetodos
 
     parametros = []    
     itemTabela = []
-    contParametros = 0
-    myTokens = lista_tokens
+    metodoAtual = []
+    myTokens = lista_tokens.copy()
     achouMetodo = 0
-    cont = 0
-    parenteses = 0
     retorno = 0
 
-    for token in myTokens:
+    while len(myTokens) > 0:
+        token = myTokens.pop(0)
         linha = token[0]
         tipo = token[1]
         valor = token[2]
 
-        if(valor == 'metodo\n'):
-            achouMetodo = 1
+        if(tipo == 'PRE'):
+            if(valor == 'metodo\n'):
+                achouMetodo = 1
+            elif(retorno == 1):
+                itemTabela.append(valor)
+                if(verificaMetodo(itemTabela)):
+                    listaMetodos.append(itemTabela)
+                    metodoAtual = itemTabela.copy()
+                    itemTabela = []
+                retorno = 0
+                achouMetodo = 0
+            elif(valor == 'resultado\n'):
+                token = myTokens.pop(0)
+                linha = token[0]
+                tipo = token[1]
+                valor = token[2]
+                if(tipo == 'PRE'):
+                    if(valor == 'vazio\n' and metodoAtual[3] != 'vazio\n'):
+                        erroRetornoMetodo(linha, metodoAtual)
+                #elif(tipo == 'IDE'):
+                    #var = pegaVariavel(valor, metodoAtual)
+                    #const = verificaConstante(token)
+                    #if(var):
+                        #if(metodoAtual[3] != var[2]):
+                            #erroRetornoMetodo(linha, metodoAtual)
+                    #elif(const):
+                        #if(metodoAtual[3] != const[2]):
+                            #erroRetornoMetodo(linha, metodoAtual)
+                #else:
+                    #erroRetornoMetodo(linha, metodoAtual)
         elif(achouMetodo == 1): #nome do metodo
             achouMetodo = 2
             itemTabela.append(linha)
-            itemTabela.append(valor[:-1])
+            itemTabela.append(valor[:-1]) #Nome do metodo
 
             # listaMetodos[cont][0] = linha
             # listaMetodos[cont][1] = valor[:-1]
-        elif(achouMetodo == 2 and parenteses == 0): #(
-            parenteses = 1
-        elif(achouMetodo == 2 and parenteses == 1): #parametro
-            parametros.append(token[:-1])
-            contParametros = contParametros + 1
-            parenteses = 2
-        elif(achouMetodo == 2 and parenteses == 2): #) ou ,
-            if (valor == ',\n'):
-                parenteses = 1
-            elif (valor == ')\n'):
-                achouMetodo = 3
-                parenteses = 0
-        elif(achouMetodo == 3 and retorno == 0): #:
-            retorno == 1
-            contParametros = 0
+        elif(achouMetodo == 2 and valor == '(\n'): #(
+            itemParam = []
+            while token[2]!=')\n':
+                token = myTokens.pop(0)
+                linha = token[0]
+                tipo = token[1]
+                valor = token[2]
+
+                if(valor !=')\n'):
+                    if(valor !=',\n'):                    
+                        itemParam.append(valor)
+                    else:
+                        parametros.append(itemParam)
+                        itemParam = []
+                else:
+                    parametros.append(itemParam)
+            retorno = 1
             itemTabela.append(parametros)
+            
+def verificaMetodo(item):
+    global listaMetodos
 
-            # listaMetodos[cont][2] = parametros
-        elif(achouMetodo == 3 and retorno == 1): #tipo do retorno
-            # listaMetodos[cont][3] = valor[:-1]
-            cont = cont + 1
-            retorno = 0
-            achouMetodo = 0
-
-            itemTabela.append(valor[:-1])
-            listaMetodos.append(itemTabela)
-            itemTabela = []
+    for metodo in listaMetodos:
+        iguais = 0
+        if(item[1] == metodo[1]): #nome igual
+            paramsItem = item[2]
+            paramsMetodo = metodo[2]
+            if(len(paramsItem) == len(paramsMetodo)):# Se a quantidade de parametros for a mesma Há a possibilidade de serem iguais
+                i = 0
+                for param in paramsMetodo: #Percorre os parametros
+                    if(param[0] == paramsItem[i][0]): #Vai contando a quantidade de parametros iguais
+                        iguais = iguais + 1
+                    else: #Se algum for diferente para
+                        break
+                    i += 1
+                if(iguais == len(paramsItem)): #Se todos os param forem iguais tá errado
+                    imprimeErroMetodo(metodo[0], item[0], item[1] )
+                    return False
+    return True
 
 
 def separaConstantes(lista_tokens):
@@ -261,7 +422,6 @@ def separaConstantes(lista_tokens):
 
     mapeiaConstantes(myTokens)
 
-
 def mapeiaConstantes(lista_tokens):
     global tabelaConstantes
 
@@ -275,14 +435,17 @@ def mapeiaConstantes(lista_tokens):
         tipo = token[1]
         valor = token[2]
 
-        if(tipo == 'PRE' and valor != 'constantes\n'): #Achou nova tipagem de constante
+        if(tipo == 'PRE' and valor != 'constantes\n' and valor != 'falso\n' and valor != 'verdadeiro\n'): #Achou nova tipagem de constante
             tipagemAtual = valor
         elif(tipo == 'IDE'): #Achou novo nome de constante
             itemTabela.append(linha)
             itemTabela.append(tipagemAtual) #Referente à tipagem da constante. Não confundir com 'tipo', que é o tipo do TOKEN, não da variável
             itemTabela.append(valor)
 
-            tabelaConstantes.append(itemTabela)
+            if(verificaConstante(itemTabela) == True):
+                tabelaConstantes.append(itemTabela)
+            else:
+                imprimeErroConstante(linha, ultimaConstante, tipagemAtual)
             
             #Não é necessário salvar o contexto, pois essa tabela é própria para constantes
             ultimaConstante = valor
@@ -303,8 +466,29 @@ def mapeiaConstantes(lista_tokens):
                 if not(tipo == 'NRO' and "." in valor): #atribuicao errada OU é um inteiro
                     imprimeErroConstante(str(linha), ultimaConstante[:-1], tipagemAtual[-1])
 
+def verificaConstante(item):
+    global tabelaConstantes
+
+    for constante in tabelaConstantes:
+        if(constante[2] == item[2]):
+            return constante
+    return True
+
 def imprimeErroConstante(linhaerro, ultimaConstante, tipagemErro):
     global erros
     global nroErro
 
     erros.append("Erro encontrado na linha "+linhaerro+". Atribuição inadequada para constante <"+ultimaConstante+">, que possui o tipo "+tipagemErro+".")
+
+def pegaVariavel(nome, escopo):
+    global listaTabelaVariaveis
+    global listaMetodos
+
+    indice = listaMetodos.index(escopo)
+    print(listaTabelaVariaveis)
+    variaveisMetodo = listaTabelaVariaveis[indice]
+
+    for variavel in variaveisMetodo:
+        if(variavel[2] == nome):
+            return variavel
+    return False
