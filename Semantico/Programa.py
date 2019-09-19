@@ -84,23 +84,24 @@ def analisaMetodos(tokens):
                 if(valor == 'variaveis\n'):
                     bloco_variaveis = separaBloco(bloco_metodo) 
                     mapeiaDeclaracao(tabela_variaveis, bloco_variaveis) #No fim a tabela de variaveis deve estar preenchida
-                if(tipo == 'PRE'):
+                elif(tipo == 'PRE'):
                     if(valor == 'leia\n'):
                         inst_leia = []
-                        while valor != ';':
+                        while valor != ';\n':
                             token = bloco_metodo.pop(0)
                             [linha, tipo, valor] = token                            
                             inst_leia.append(token) #Ao fim o inst_leia será a instrução sem o 'leia'
                         analisaLeia(inst_leia, tabela_variaveis)
                     elif(valor == 'escreva\n'):
                         inst_escreva = []
-                        while valor != ';':
+                        while valor != ';\n':
                             token = bloco_metodo.pop(0)
                             [linha, tipo, valor] = token                            
                             inst_escreva.append(token) #Ao fim o inst_escreva será a instrução sem o 'escreva'
                         analisaEscreva(inst_escreva, tabela_variaveis)
                     elif(valor == 'se\n'):
-                        analisaLogicaSe(bloco_metodo)
+                        pass
+                        # analisaLogicaSe(bloco_metodo)
                         #Nesse ponto bloco_metodo não terá mais a declaração do se
                     elif(valor == 'enquanto\n'):
                         pass
@@ -170,12 +171,13 @@ def analisaResultado(tokens, tipo_metodo, variaveis):
     token = tokens.pop(0)
     [linha, tipo, valor] = token
     if(tipo == 'IDE'):
-        variavel = getItem(variaveis, ['', '', valor]))
+        variavel = getItem(variaveis, ['', '', valor])
         if(not variavel):
             imprimeErroVariavel(2, [linha, '', valor])
-        elif(variavel[2] != tipo_metodo)
+        elif(variavel[2] != tipo_metodo):
             erros.append('Erro encontrado na linha: '+linha+'. Retorno esperado '+listaMetodos[num_metodo][3])
-        elif(variavel[])
+        # elif(variavel[]):
+        #     pass
 
 #Leia -----------------------------------
 def analisaLeia(tokens, listaVariaveis):
@@ -196,7 +198,7 @@ def analisaEscreva(tokens, variaveis):
         [linha, tipo, valor] = token
         
         if(tipo == 'IDE'):
-            variavel = getItem(listaVariaveis, ['', '', valor]))
+            variavel = getItem(variaveis, ['', '', valor])
             if(not variavel):
                 imprimeErroVariavel(2, [linha, '', valor])
             elif(cadeia and variavel[1] != 'CAD'):
@@ -232,9 +234,9 @@ def separaBloco(tokens):
     
 def mapeiaDeclaracao(listaApend, tokens):
     tipo_atual = ''
-    vetor = 0
+    vetor = 0    
+    item_tabela = []
     while len(tokens)>0:
-        item_tabela = []
 
         token = tokens.pop(0)        
         [linha, tipo, valor] = token
@@ -273,6 +275,7 @@ def mapeiaDeclaracao(listaApend, tokens):
             else:
                 listaApend.append(item_tabela)
                 ultimaConstante = item_tabela
+                item_tabela = []
 
 def getItem(lista, value):
     for item in lista:
