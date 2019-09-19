@@ -106,9 +106,30 @@ def analisaMetodos(tokens):
                     elif(valor == 'enquanto\n'):
                         pass
                     elif(valor == 'resultado\n'):
-                        analisaResultado(bloco_metodo, listaMetodos[num_metodo][3], tabela_variaveis)
+                        exp = []
+                        while valor != ';\n':
+                            token = bloco_metodo.pop(0)
+                            [linha, tipo, valor] = token
+                            exp.append(token)
+
+                        validaAtribuicao(['', listaMetodos[num_metodo][2], ''], exp, tabela_variaveis)
                 elif(tipo == 'IDE'):
-                    pass
+                    var_aux = valor
+                    var = getItem(tabela_variaveis, token)
+                    const = getItem(tabelaConstantes, token)
+
+                    token = bloco_metodo.pop(0) #Só pra remover o = da atrib
+                    exp = []
+                    while valor != ';\n':
+                        token = bloco_metodo.pop(0)
+                        [linha, tipo, valor] = token
+                        exp.append(token)
+                    if(var):
+                        validaAtribuicao(var, exp, tabela_variaveis)
+                    elif(const):
+                        erros.append("Erro encontrado na linha "+linha+". "+var_aux+' é constante!')
+                    else:
+                        erros.append("Erro encontrado na linha "+linha+". "+var_aux+' não foi declarada!')
 
         elif(token[2] == 'principal\n'):
             True
@@ -120,8 +141,8 @@ def mapeiaMetodo(tokens):
     in_parametros = False
     parametros = []
     item_parametro = []
+    item_tabela = []
     while not fim_declaracao:
-        item_tabela = []
         token = tokens.pop(0)
         [linha, tipo, valor] = token
         if(in_parametros):
@@ -142,6 +163,7 @@ def mapeiaMetodo(tokens):
             item_tabela.append(valor)
             if(validaMetodo(item_tabela)):
                 listaMetodos.append(item_tabela)
+                item_tabela = []
             else:
                 imprimeErroMetodo(item_tabela)
             fim_declaracao = True
@@ -166,18 +188,6 @@ def imprimeErroMetodo(item):
     global erros
 
     erros.append("Erro encontrado na linha "+item[0]+". Já existe Metodo "+item[1]+" e parametros "+item[2]+".")
-
-def analisaResultado(tokens, tipo_metodo, variaveis):
-    token = tokens.pop(0)
-    [linha, tipo, valor] = token
-    if(tipo == 'IDE'):
-        variavel = getItem(variaveis, ['', '', valor])
-        if(not variavel):
-            imprimeErroVariavel(2, [linha, '', valor])
-        elif(variavel[2] != tipo_metodo):
-            erros.append('Erro encontrado na linha: '+linha+'. Retorno esperado '+listaMetodos[num_metodo][3])
-        # elif(variavel[]):
-        #     pass
 
 #Leia -----------------------------------
 def analisaLeia(tokens, listaVariaveis):
@@ -284,14 +294,60 @@ def getItem(lista, value):
     
     return False
 
-def validaAtribuicao(destino, expressao): #Expressao será um array de tokens do lado direito do =
+def validaAtribuicao(destino, expressao, variaveis): #Expressao será um array de tokens do lado direito do =
     global erros
+    global tabelaConstantes
+
     tipo_destino = destino[1]
+    tipo_expressao = tipoExpressao(expressao)
     if(tipo_destino == 'vazio\n' and expressao[0][2] != 'vazio\n'):
         erros.append("Erro encontrado na linha "+expressao[0][0]+". Esperava retorno do tipo "+tipo_destino)
+        return
     elif(tipo_destino == 'inteiro\n' or tipo_destino == 'real\n'):
-        pass
+        if(len(tipo_expressao)>1):
+            erros.append("Erro encontrado na linha "+expressao[0][0]+". Atribuindo uma expressão lógica incorretamente!")
+        elif(tipo_expressao[0]=='var'):
+            varOuConstTipo(variaveis, expressao[0], tipo_destino)
+        elif(tipo_expressao[0]=='num'):
+            if(tipo_destino == 'inteiro\n' and '.' in expressao[0][2]):
+                erros.append("Erro encontrado na linha "+expressao[0][0]+". Esperava atribuição do tipo "+tipo_destino+', recebeu do tipo real')
     elif(tipo_destino == 'texto\n'):
-        pass
+        pass #A gramatica não permite atribuir texto só em constantes
     elif(tipo_destino == 'boleano\n'):
         pass
+
+def tipoExpressao(tokens):
+    tipo_expressao = ['nada']
+    pos = 0
+
+    for token in tokens:
+        [linha, tipo, valor] = token
+        if(tipo == 'IDE' and tipo_expressao[pos] == 'nada'):
+            tipo_expressao[pos] = 'var'
+        elif(tipo == 'ART'):
+            tipo_expressao[pos] = 'art'
+        elif(tipo == 'LOG'):
+            tipo_expressao[pos] = 'log'
+            pos = pos + 1
+            tipo_expressao.append('nada')
+        elif(tipo == 'REL'):
+            tipo_expressao[pos] = 'log'
+        elif(tipo == 'NRO' and tipo_expressao[pos] == 'nada'):
+            tipo_expressao[pos] = 'num'
+
+    return tipo_expressao
+
+def varOuConstTipo(variaveis, token, tipo_destino):
+    global tabelaConstantes
+
+    var = getItem(variaveis, token[0])
+    if(var):
+        if(var[1] != tipo_destino):
+            erros.append("Erro encontrado na linha "+token[0][0]+". Esperava atribuição do tipo "+tipo_destino+', recebeu do tipo '+var[1])
+    else:
+        const = getItem(tabelaConstantes, token[0])
+        if(const):
+            if(var[1] != tipo_destino):
+                erros.append("Erro encontrado na linha "+token[0][0]+". Esperava atribuição do tipo "+tipo_destino+', recebeu do tipo '+var[1])
+        else:
+            erros.append("Erro encontrado na linha "+token[0][0]+". "+expressão[0][2]+' Não foi declarado!')

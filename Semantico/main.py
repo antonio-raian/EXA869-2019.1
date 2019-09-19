@@ -1,5 +1,5 @@
 import os
-from SEMANTICO import Programa as programa
+from Semantico import Programa as programa
 
 #Globais
 tokenAtual = ''

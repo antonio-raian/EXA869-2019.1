@@ -3,7 +3,7 @@
 
 from LEXICO import main as lexico
 from SINTATICO import main as sintatico
-from SEMANTICO import main as semantico
+from Semantico import main as semantico
 
 lexico.main()
 sintatico.main()
