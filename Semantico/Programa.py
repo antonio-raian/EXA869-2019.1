@@ -112,11 +112,28 @@ def validaCorpoMetodo(tokens, variaveis, num):
                     inst_escreva.append(token) #Ao fim o inst_escreva será a instrução sem o 'escreva'
                 analisaEscreva(inst_escreva, variaveis)
             elif(valor == 'se\n'):
-                pass
-                analisaLogicaSe(tokens)
+                exp_se = []
+                while valor != 'entao\n':
+                    token = tokens.pop(0)
+                    [linha, tipo, valor] = token                            
+                    exp_se.append(token) #Ao fim o exp_se será a expressao do se
+                analisaLog(exp_se, variaveis, 'boleano\n')
                 #Nesse ponto tokens não terá mais a declaração do se
+                bloco_se = separaBloco(tokens)
+                validaCorpoMetodo(bloco_se, variaveis, num)
+            elif(valor == 'senao\n'):
+                bloco_senao = separaBloco(tokens)
+                validaCorpoMetodo(bloco_senao, variaveis, num)
             elif(valor == 'enquanto\n'):
-                pass
+                exp_enquanto = []
+                while valor != 'entao\n':
+                    token = tokens.pop(0)
+                    [linha, tipo, valor] = token                            
+                    exp_enquanto.append(token) #Ao fim o exp_enquanto será a expressao do enquanto
+                analisaLog(exp_enquanto, variaveis, 'boleano\n')
+                #Nesse ponto tokens não terá mais a declaração do enquanto
+                bloco_enquanto = separaBloco(tokens)
+                validaCorpoMetodo(bloco_enquanto, variaveis, num)
             elif(valor == 'resultado\n'):
                 exp = []
                 while valor != ';\n':
@@ -129,19 +146,22 @@ def validaCorpoMetodo(tokens, variaveis, num):
             var_aux = valor
             var = getItem(variaveis, token)
             const = getItem(tabelaConstantes, token)
+            metod = getMetodo(token)
 
-            token = tokens.pop(0) #Só pra remover o = da atrib
             exp = []
             while valor != ';\n':
                 token = tokens.pop(0)
                 [linha, tipo, valor] = token
                 exp.append(token)
             if(var):
+                exp.pop(0) #Só pra remover o =
                 validaAtribuicao(var, exp, variaveis)
             elif(const):
                 erros.append("Erro encontrado na linha "+linha+". "+var_aux+' é constante!')
+            elif(metod):
+                validaChamadaMetodo(metod, exp, variaveis)
             else:
-                erros.append("Erro encontrado na linha "+linha+". "+var_aux+' não foi declarada!')
+                erros.append("Erro encontrado na linha "+linha+". "+var_aux+' não encontrado (a)!')
 
 def mapeiaMetodo(tokens):
     global listaMetodos
@@ -177,6 +197,12 @@ def mapeiaMetodo(tokens):
                 imprimeErroMetodo(item_tabela)
             fim_declaracao = True
 
+def validaChamadaMetodo(metodo, exp, variaveis):
+    while len(exp)>0:
+        token = exp.pop(0)
+        [linha, tipo, valor] = token
+        
+
 def validaMetodo(item):
     global listaMetodos
 
@@ -192,6 +218,14 @@ def validaMetodo(item):
                 if(len(metodo[2]) == qtd_igual):
                     return False
     return True
+
+def getMetodo(token):
+    global listaMetodos
+
+    for metodo in listaMetodos:
+        if(metodo[1] == token[2]):
+            return metodo
+    return False
 
 def imprimeErroMetodo(item):
     global erros
@@ -320,7 +354,7 @@ def validaAtribuicao(destino, expressao, variaveis): #Expressao será um array d
         elif(tipo_expressao[0]=='num'):
             if(tipo_destino == 'inteiro\n' and '.' in expressao[0][2]):
                 erros.append("Erro encontrado na linha "+expressao[0][0]+". Esperava atribuição do tipo "+tipo_destino+', recebeu do tipo real')
-        elif(tipo_expressao[0 == 'ari']):
+        elif(tipo_expressao[0] == 'ari'):
             while len(expressao)>0:
                 token = expressao.pop(0)
                 [linha, tipo, valor] = token
@@ -335,66 +369,63 @@ def validaAtribuicao(destino, expressao, variaveis): #Expressao será um array d
                 elif(tipo == 'NRO'):
                     if(tipo_destino == 'inteiro\n' and '.' in expressao[0][2]):
                         erros.append("Erro encontrado na linha "+token[0]+". Esperava atribuição do tipo "+tipo_destino+', recebeu do tipo real')
-        elif(tipo_expressao[0 == 'log']):
-            auxlog1 = ""
-            auxlog2 = ""
-
-            while len(expressao)>0:
-                token = expressao.pop(0)
-                [linha, tipo, valor] = token
-                if(tipo_destino != 'boleano\n'):
-                    erros.append("Erro encontrado na linha "+token[0]+". Atribuicao de expressão relacional ou lógica para variável de tipo não-boleano.")
-                elif(tipo == 'IDE' and auxlog1 == ""):
-                    varlog = getItem(variaveis, token)
-
-                    if not varlog:
-                        varlog = getItem(tabelaConstantes, token)
-                        if not varlog:
-                            erros.append("Erro encontrado na linha "+token[0]+". "+token[2]+' Não foi declarado!')
-                        else:
-                            auxlog1 = varlog[1]
-                    else:
-                        auxlog1 = varlog[1]
-                elif(tipo == 'IDE' and auxlog1 != ""):
-                    varlog2 = getItem(variaveis, token)
-
-                    if not varlog2:
-                        varlog2 = getItem(tabelaConstantes, token)
-                        if not varlog2:
-                            erros.append("Erro encontrado na linha "+token[0]+". "+token[2]+' Não foi declarado!')
-                        else:
-                            auxlog2 = varlog2[1]
-                    else:
-                        auxlog2 = varlog2[1]
-
-                        if auxlog1 != auxlog2:
-                            erros.append("Erro encontrado na linha "+token[0]+". "+token[2]+' Operação lógica/relacional entre variáveis de tipos diferentes!')
-                        auxlog1 = ""
-                        auxlog2 = ""
-                elif(tipo == 'PRE'):
-                    if (valor != 'verdadeiro\n' and valor != 'falso\n'):
-                        erros.append("Erro encontrado na linha "+token[0]+". Esperava atribuição do tipo boleano, encontrou atribuicao de palavra reservada.")
-                elif(tipo == 'NRO' and auxlog1 == ""):
-                    auxlog1 == 'inteiro\n'
-                elif(tipo == 'NRO' and auxlog1 != ""):
-                    if (auxlog1 != 'inteiro\n' and auxlog1 != 'real\n'):
-                        erros.append("Erro encontrado na linha "+token[0]+". Operação lógica/relacional entre variáveis de tipos diferentes! ")
-
-                else:
-                    erros.append("Erro encontrado na linha "+token[0]+". Esperava atribuição do tipo boleano, encontrou atribuicao desconhecida.")
-
-
-
-
-
-
-
-
+        elif(tipo_expressao[0] == 'log'):
+            analisaLog(expressao, variaveis)
     elif(tipo_destino == 'texto\n'):
         pass #A gramatica não permite atribuir texto só em constantes
     elif(tipo_destino == 'boleano\n'):
         pass
     
+def analisaLog(expressao, variaveis, tipo_destino):
+    global tabelaConstantes
+    global erros
+    auxlog1 = ""
+    auxlog2 = ""
+
+    while len(expressao)>0:
+        token = expressao.pop(0)
+        [linha, tipo, valor] = token
+        if(tipo_destino != 'boleano\n'):
+            erros.append("Erro encontrado na linha "+token[0]+". Atribuicao de expressão relacional ou lógica para variável de tipo não-boleano.")
+        elif(tipo == 'IDE' and auxlog1 == ""):
+            varlog = getItem(variaveis, token)
+
+            if not varlog:
+                varlog = getItem(tabelaConstantes, token)
+                if not varlog:
+                    erros.append("Erro encontrado na linha "+token[0]+". "+token[2]+' Não foi declarado!')
+                else:
+                    auxlog1 = varlog[1]
+            else:
+                auxlog1 = varlog[1]
+        elif(tipo == 'IDE' and auxlog1 != ""):
+            varlog2 = getItem(variaveis, token)
+
+            if not varlog2:
+                varlog2 = getItem(tabelaConstantes, token)
+                if not varlog2:
+                    erros.append("Erro encontrado na linha "+token[0]+". "+token[2]+' Não foi declarado!')
+                else:
+                    auxlog2 = varlog2[1]
+            else:
+                auxlog2 = varlog2[1]
+
+                if auxlog1 != auxlog2:
+                    erros.append("Erro encontrado na linha "+token[0]+". "+token[2]+' Operação lógica/relacional entre variáveis de tipos diferentes!')
+                auxlog1 = ""
+                auxlog2 = ""
+        elif(tipo == 'PRE'):
+            if (valor != 'verdadeiro\n' and valor != 'falso\n'):
+                erros.append("Erro encontrado na linha "+token[0]+". Esperava atribuição do tipo boleano, encontrou atribuicao de palavra reservada.")
+        elif(tipo == 'NRO' and auxlog1 == ""):
+            auxlog1 == 'inteiro\n'
+        elif(tipo == 'NRO' and auxlog1 != ""):
+            if (auxlog1 != 'inteiro\n' and auxlog1 != 'real\n'):
+                erros.append("Erro encontrado na linha "+token[0]+". Operação lógica/relacional entre variáveis de tipos diferentes! ")
+
+        else:
+            erros.append("Erro encontrado na linha "+token[0]+". Esperava atribuição do tipo boleano, encontrou atribuicao desconhecida.")
+
 
 def tipoExpressao(tokens):
     tipo_expressao = ['nada']
