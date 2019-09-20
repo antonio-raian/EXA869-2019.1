@@ -23,9 +23,11 @@ def main(lista_tokens, arq):
     output = open(diretorioSaida +file, 'w')
 
     analisaConstantes(tokens)
+    #tokens = lista_tokens.copy()
     #Nesse ponto os tokens não possuem mais as constantes e a tabela de constantes está preenchida
     analisaMetodos(tokens)
-    return True
+    print (erros)
+    return erros
 #Constantes ------------------------------- 
 def analisaConstantes(tokens):
     global tabelaConstantes
@@ -66,9 +68,11 @@ def analisaMetodos(tokens):
     global listaMetodos
     global erros
 
+
     fim_programa = False
     num_metodo = -1
-    while not fim_programa:
+    while len(tokens) > 0:
+
         num_metodo = num_metodo + 1
         token = ''
         token = tokens.pop(0)
@@ -159,7 +163,7 @@ def mapeiaMetodo(tokens):
                 item_parametro = []
             elif (valor == ')\n'):
                 in_parametros = False
-        elif(tipo == 'IDE'):
+        elif(tipo == 'IDE'):    
             item_tabela.append(linha)
             item_tabela.append(valor)
         elif(valor == '(\n'):
@@ -331,11 +335,66 @@ def validaAtribuicao(destino, expressao, variaveis): #Expressao será um array d
                 elif(tipo == 'NRO'):
                     if(tipo_destino == 'inteiro\n' and '.' in expressao[0][2]):
                         erros.append("Erro encontrado na linha "+token[0]+". Esperava atribuição do tipo "+tipo_destino+', recebeu do tipo real')
+        elif(tipo_expressao[0 == 'log']):
+            auxlog1 = ""
+            auxlog2 = ""
+
+            while len(expressao)>0:
+                token = expressao.pop(0)
+                [linha, tipo, valor] = token
+                if(tipo_destino != 'boleano\n'):
+                    erros.append("Erro encontrado na linha "+token[0]+". Atribuicao de expressão relacional ou lógica para variável de tipo não-boleano.")
+                elif(tipo == 'IDE' and auxlog1 == ""):
+                    varlog = getItem(variaveis, token)
+
+                    if not varlog:
+                        varlog = getItem(tabelaConstantes, token)
+                        if not varlog:
+                            erros.append("Erro encontrado na linha "+token[0]+". "+token[2]+' Não foi declarado!')
+                        else:
+                            auxlog1 = varlog[1]
+                    else:
+                        auxlog1 = varlog[1]
+                elif(tipo == 'IDE' and auxlog1 != ""):
+                    varlog2 = getItem(variaveis, token)
+
+                    if not varlog2:
+                        varlog2 = getItem(tabelaConstantes, token)
+                        if not varlog2:
+                            erros.append("Erro encontrado na linha "+token[0]+". "+token[2]+' Não foi declarado!')
+                        else:
+                            auxlog2 = varlog2[1]
+                    else:
+                        auxlog2 = varlog2[1]
+
+                        if auxlog1 != auxlog2:
+                            erros.append("Erro encontrado na linha "+token[0]+". "+token[2]+' Operação lógica/relacional entre variáveis de tipos diferentes!')
+                        auxlog1 = ""
+                        auxlog2 = ""
+                elif(tipo == 'PRE'):
+                    if (valor != 'verdadeiro\n' and valor != 'falso\n'):
+                        erros.append("Erro encontrado na linha "+token[0]+". Esperava atribuição do tipo boleano, encontrou atribuicao de palavra reservada.")
+                elif(tipo == 'NRO' and auxlog1 == ""):
+                    auxlog1 == 'inteiro\n'
+                elif(tipo == 'NRO' and auxlog1 != ""):
+                    if (auxlog1 != 'inteiro\n' and auxlog1 != 'real\n'):
+                        erros.append("Erro encontrado na linha "+token[0]+". Operação lógica/relacional entre variáveis de tipos diferentes! ")
+
+                else:
+                    erros.append("Erro encontrado na linha "+token[0]+". Esperava atribuição do tipo boleano, encontrou atribuicao desconhecida.")
+
+
+
+
+
+
+
 
     elif(tipo_destino == 'texto\n'):
         pass #A gramatica não permite atribuir texto só em constantes
     elif(tipo_destino == 'boleano\n'):
         pass
+    
 
 def tipoExpressao(tokens):
     tipo_expressao = ['nada']
