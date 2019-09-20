@@ -7,11 +7,14 @@ tokenAtual = ''
 #MAIN METOD
 def main():
     diretorio = os.path.abspath('.')+"/saida_lexico/" #Pega os codigos de saída do lexico
+    diretorioSaida = os.path.abspath('.')+"/saida_semantico/" #Pega os codigos de saída do lexico
     names_arq = os.listdir(diretorio)
+    
 
     erro_lexicos = []
 
     for file in names_arq:
+        output = open(diretorioSaida + file, 'w')
         tokens = []
         print(diretorio+file)
         with open(diretorio+file) as arq:
@@ -28,9 +31,8 @@ def main():
                         erro_lexicos.append('Erro Lexico no arquivo: '+file)
                         break
             # print(tokens)
-            if(programa.main(tokens, file)):#Chama o método que trata o inicio do programa
-                print('Deu bom')
-            else:
-                print('Deu ruim')
-        
-        print(erro_lexicos)
+
+            erros = programa.main(tokens,file)
+            for erro in erros:
+                output.write(erro+'\n')
+            output.close()
