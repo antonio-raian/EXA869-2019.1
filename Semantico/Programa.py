@@ -72,11 +72,10 @@ def analisaMetodos(tokens):
     fim_programa = False
     num_metodo = -1
     while len(tokens) > 0:
-
-        num_metodo = num_metodo + 1
         token = ''
         token = tokens.pop(0)
-        if(token[2]=='metodo\n'):
+        if(token[2]=='metodo\n'):            
+            num_metodo = num_metodo + 1
             tabela_variaveis = []
             mapeiaMetodo(tokens)
             #Nesse ponto aq os tokens não possuem mais a declaração do metodo e o topo é {
@@ -84,7 +83,13 @@ def analisaMetodos(tokens):
             #Nesse ponto os tokens não possuem mais o metodo em analise, o metodo está em bloco metodo
             validaCorpoMetodo(bloco_metodo, tabela_variaveis, num_metodo)
         elif(token[2] == 'principal\n'):
-            fim_programa = True
+            num_metodo = num_metodo + 1
+            tabela_variaveis = []
+            listaMetodos.append([token[0], 'principal\n', [], 'vazio\n'])
+            #Nesse ponto aq os tokens não possuem mais a declaração do metodo e o topo é {
+            bloco_principal = separaBloco(tokens)
+            #Nesse ponto os tokens não possuem mais o metodo em analise, o metodo está em bloco metodo
+            validaCorpoMetodo(bloco_principal, tabela_variaveis, num_metodo)
 
 def validaCorpoMetodo(tokens, variaveis, num):    
     global listaMetodos
@@ -182,6 +187,7 @@ def mapeiaMetodo(tokens):
                 parametros.append(item_parametro)
                 item_parametro = []
             elif (valor == ')\n'):
+                item_tabela.append(parametros)
                 in_parametros = False
         elif(tipo == 'IDE'):    
             item_tabela.append(linha)
@@ -198,9 +204,21 @@ def mapeiaMetodo(tokens):
             fim_declaracao = True
 
 def validaChamadaMetodo(metodo, exp, variaveis):
+    global erros
+    params = 0
     while len(exp)>0:
         token = exp.pop(0)
         [linha, tipo, valor] = token
+
+        if(tipo == 'IDE'):
+            var = varOuConstTipo(variaveis, token, [metodo[2][params][0]])
+            if(not var):
+                erros.append("Erro encontrado na linha "+linha+". "+valor+' não encontrado (a)!')
+            params = params + 1
+    
+    if(params != len(metodo[2])):
+        erros.append("Erro encontrado na linha "+linha+". Quantidade de parametros incompativel!")
+        
         
 
 def validaMetodo(item):
@@ -425,7 +443,6 @@ def analisaLog(expressao, variaveis, tipo_destino):
 
         else:
             erros.append("Erro encontrado na linha "+token[0]+". Esperava atribuição do tipo boleano, encontrou atribuicao desconhecida.")
-
 
 def tipoExpressao(tokens):
     tipo_expressao = ['nada']
