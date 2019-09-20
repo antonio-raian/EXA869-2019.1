@@ -296,7 +296,7 @@ def mapeiaDeclaracao(listaApend, tokens):
         if(tipo == 'PRE'):
             if(valor != 'verdadeiro\n' and valor != 'falso\n'):
                 tipo_atual = valor
-            elif(tipo_atual != 'booleano\n'):
+            elif(tipo_atual != 'boleano\n'):
                 imprimeErroConstante(1, [linha, tipo_atual])
         elif(tipo == 'IDE'):
             item_tabela.append(linha)
