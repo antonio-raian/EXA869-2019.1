@@ -78,61 +78,66 @@ def analisaMetodos(tokens):
             #Nesse ponto aq os tokens não possuem mais a declaração do metodo e o topo é {
             bloco_metodo = separaBloco(tokens)
             #Nesse ponto os tokens não possuem mais o metodo em analise, o metodo está em bloco metodo
-            while len(bloco_metodo)>0:
-                token = bloco_metodo.pop(0)
-                [linha, tipo, valor] = token
-                if(valor == 'variaveis\n'):
-                    bloco_variaveis = separaBloco(bloco_metodo) 
-                    mapeiaDeclaracao(tabela_variaveis, bloco_variaveis) #No fim a tabela de variaveis deve estar preenchida
-                elif(tipo == 'PRE'):
-                    if(valor == 'leia\n'):
-                        inst_leia = []
-                        while valor != ';\n':
-                            token = bloco_metodo.pop(0)
-                            [linha, tipo, valor] = token                            
-                            inst_leia.append(token) #Ao fim o inst_leia será a instrução sem o 'leia'
-                        analisaLeia(inst_leia, tabela_variaveis)
-                    elif(valor == 'escreva\n'):
-                        inst_escreva = []
-                        while valor != ';\n':
-                            token = bloco_metodo.pop(0)
-                            [linha, tipo, valor] = token                            
-                            inst_escreva.append(token) #Ao fim o inst_escreva será a instrução sem o 'escreva'
-                        analisaEscreva(inst_escreva, tabela_variaveis)
-                    elif(valor == 'se\n'):
-                        pass
-                        # analisaLogicaSe(bloco_metodo)
-                        #Nesse ponto bloco_metodo não terá mais a declaração do se
-                    elif(valor == 'enquanto\n'):
-                        pass
-                    elif(valor == 'resultado\n'):
-                        exp = []
-                        while valor != ';\n':
-                            token = bloco_metodo.pop(0)
-                            [linha, tipo, valor] = token
-                            exp.append(token)
-
-                        validaAtribuicao(['', listaMetodos[num_metodo][2], ''], exp, tabela_variaveis)
-                elif(tipo == 'IDE'):
-                    var_aux = valor
-                    var = getItem(tabela_variaveis, token)
-                    const = getItem(tabelaConstantes, token)
-
-                    token = bloco_metodo.pop(0) #Só pra remover o = da atrib
-                    exp = []
-                    while valor != ';\n':
-                        token = bloco_metodo.pop(0)
-                        [linha, tipo, valor] = token
-                        exp.append(token)
-                    if(var):
-                        validaAtribuicao(var, exp, tabela_variaveis)
-                    elif(const):
-                        erros.append("Erro encontrado na linha "+linha+". "+var_aux+' é constante!')
-                    else:
-                        erros.append("Erro encontrado na linha "+linha+". "+var_aux+' não foi declarada!')
-
+            validaCorpoMetodo(bloco_metodo, tabela_variaveis, num_metodo)
         elif(token[2] == 'principal\n'):
-            True
+            fim_programa = True
+
+def validaCorpoMetodo(tokens, variaveis, num):    
+    global listaMetodos
+    global erros
+
+    while len(tokens)>0:
+        token = tokens.pop(0)
+        [linha, tipo, valor] = token
+        if(valor == 'variaveis\n'):
+            bloco_variaveis = separaBloco(tokens) 
+            mapeiaDeclaracao(variaveis, bloco_variaveis) #No fim a tabela de variaveis deve estar preenchida
+        elif(tipo == 'PRE'):
+            if(valor == 'leia\n'):
+                inst_leia = []
+                while valor != ';\n':
+                    token = tokens.pop(0)
+                    [linha, tipo, valor] = token                            
+                    inst_leia.append(token) #Ao fim o inst_leia será a instrução sem o 'leia'
+                analisaLeia(inst_leia, variaveis)
+            elif(valor == 'escreva\n'):
+                inst_escreva = []
+                while valor != ';\n':
+                    token = tokens.pop(0)
+                    [linha, tipo, valor] = token                            
+                    inst_escreva.append(token) #Ao fim o inst_escreva será a instrução sem o 'escreva'
+                analisaEscreva(inst_escreva, variaveis)
+            elif(valor == 'se\n'):
+                pass
+                analisaLogicaSe(tokens)
+                #Nesse ponto tokens não terá mais a declaração do se
+            elif(valor == 'enquanto\n'):
+                pass
+            elif(valor == 'resultado\n'):
+                exp = []
+                while valor != ';\n':
+                    token = tokens.pop(0)
+                    [linha, tipo, valor] = token
+                    exp.append(token)
+
+                validaAtribuicao(['', listaMetodos[num][2], ''], exp, variaveis)
+        elif(tipo == 'IDE'):
+            var_aux = valor
+            var = getItem(variaveis, token)
+            const = getItem(tabelaConstantes, token)
+
+            token = tokens.pop(0) #Só pra remover o = da atrib
+            exp = []
+            while valor != ';\n':
+                token = tokens.pop(0)
+                [linha, tipo, valor] = token
+                exp.append(token)
+            if(var):
+                validaAtribuicao(var, exp, variaveis)
+            elif(const):
+                erros.append("Erro encontrado na linha "+linha+". "+var_aux+' é constante!')
+            else:
+                erros.append("Erro encontrado na linha "+linha+". "+var_aux+' não foi declarada!')
 
 def mapeiaMetodo(tokens):
     global listaMetodos

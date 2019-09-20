@@ -25,7 +25,7 @@ def main():
                             tokens.append(linha.split(' ', 2)) #Coloca a linha em fomato de array
                     else:
                         lexico = True
-                        erro_lexicos.append('Erro Lexico no arquivo: '+file)
+                        erro_lexicos.append('Erro Semantico no arquivo: '+file)
                         break
             # print(tokens)
             if(programa.main(tokens, file)):#Chama o método que trata o inicio do programa
